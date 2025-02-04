@@ -691,9 +691,4 @@
   .icon-big {
 		width: 100px;
 	}
-
-  #networkDropdown{
-    color: hsl(var(--twc-textColor));
-    background-color: hsl(var(--twc-cardBackgroundColor));
-  }
 </style>
