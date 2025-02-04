@@ -10,5 +10,6 @@ COPY . .
 # Install dependencies
 RUN npm install
 EXPOSE 3009
+
 # Set the command to start the Node.js app
 CMD ["npm", "start"]
