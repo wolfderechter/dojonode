@@ -1,11 +1,9 @@
-version: "3.9"
-
 services:
-  dojonode:
-    image: wolfderechter/dojonode:latest
+  client:
+    image: wolfderechter/dojonode-client:latest
     ports:
       - "7744:80"
-  dojonode-systeminformation:
-    image: wolfderechter/dojonode-systeminformation:latest
+  server:
+    image: wolfderechter/dojonode-server:latest
     ports:
       - "3009:3009"
