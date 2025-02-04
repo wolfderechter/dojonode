@@ -32,7 +32,7 @@ jobs:
       - name: Build and push latest
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ./apps/client/
           file: ./apps/client/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
@@ -43,7 +43,7 @@ jobs:
       - name: Build and push latest
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ./apps/server
           file: ./apps/server/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
