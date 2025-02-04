@@ -13,7 +13,6 @@
   import ChainCard from "../components/ChainCard.svelte";
   import ThemeSwitcher from "../components/ThemeSwitcher.svelte";
   import Progressbar from "../components/Progressbar.svelte";
-  import Footer from "../components/Footer.svelte";
   import purseIcon from "../assets/icons/Purse.avif";
   import heartIcon from "../assets/icons/Heart.avif";
   import brainIcon from "../assets/icons/Brain.avif";
@@ -30,7 +29,6 @@
   import warningIcon from "../assets/icons/Warning.avif";
   import antennaIcon from "../assets/icons/Antenna.avif";
   import { MetricTypes, NodeTypes } from "../domain/enums";
-  import headerImage from '../assets/Header.avif';
   import type {
   Systeminfo,
     SysteminformationMetricsInterface,
@@ -408,17 +406,6 @@
   });
 </script>
 
-<header class="flex flex-col items-center justify-center w-[90%] m-auto">
-  <span>
-    <a href="https://dojonode.xyz/shomen">
-      <img src={headerImage} class="max-w-full max-h-[20vh] w-auto h-auto mt-2" alt="dojo node header with trees and the logo" />
-    </a>
-    <div class="w-[60px] ml-auto mr-8 lg:-mb-12 md:mb-4 mb-2">
-      <ThemeSwitcher />
-    </div>
-  </span>
-</header>
-
 <div class="flex flex-col items-center">
   <div class="text-center relative pt-4 md:pt-10">
     <section>
@@ -625,7 +612,6 @@
     </div>
   </div>
 </div>
-<Footer />
 
 {#if connectionsOpen}
   <DetailsModal title={"Connections"} bind:isOpen={connectionsOpen}>

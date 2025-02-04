@@ -1,8 +1,8 @@
 version: "3.9"
 
 services:
-  taiko-node-dashboard:
-    image: wolfderechter/taiko-node-dashboard:latest
+  dojonode:
+    image: wolfderechter/dojonode:latest
     ports:
       - "7744:80"
   dojonode-systeminformation:
