@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import * as simpleDuration from "simple-duration";
-  import confetti from "canvas-confetti";
   import { queryPrometheus } from "../utils/prometheus";
   import { initializeRPCConnection } from "../utils/connection";
   import {
@@ -21,13 +20,13 @@
   import fileboxIcon from "../assets/icons/FileBox.avif";
   import dojoScrollIcon from "../assets/icons/DojoScroll.svg";
   import chainIcon from "../assets/icons/Chain.avif";
-  import nodeTaikoIcon from "../assets/icons/NodeTaiko.avif";
   import packageIcon from "../assets/icons/Package.avif";
   import abacusIcon from "../assets/icons/Abacus.avif";
   import gasIcon from "../assets/icons/Gas.avif";
   import timerclockIcon from "../assets/icons/Timer_Clock.avif";
   import warningIcon from "../assets/icons/Warning.avif";
   import antennaIcon from "../assets/icons/Antenna.avif";
+  import ethIcon from "../assets/icons/Ethereum.avif";
   import { MetricTypes, NodeTypes } from "../domain/enums";
   import type {
   Systeminfo,
@@ -35,26 +34,18 @@
   } from "../domain/types";
   import {
     ETH_RPC_API_URL,
-    L2_TAIKO_RPC_API_URL,
     MYNODE_API_URL,
     PROMETHEUS_API_URL,
     SYSTEMINFO_API_URL,
-    EVENT_INDEXER_API_URL,
   } from "../domain/constants";
 
-  const urlParams = new URLSearchParams(window.location.search);
-  let expertModeCounter = 0;
   let selected = 'mainnet'
-  let url;
-  let expertMode = false;
   let myNode;
   let ethRPC;
-  let L2TaikoRPC;
   let fetchSystemInfoError = false;
   let fetchPrometheusError = false;
   let fetchMyNodeError = false;
   let fetchEthRPCError = false;
-  let fetchL2TaikoRPCError = false;
   let fetchEventIndexerError = false;
   $:hasError = fetchSystemInfoError ||
       fetchPrometheusError ||
@@ -78,18 +69,6 @@
     getLocalStorageItem("CUSTOM_PROMETHEUS_API_URL") || PROMETHEUS_API_URL;
   let CUSTOM_SYSTEMINFO_API_URL =
     getLocalStorageItem("CUSTOM_SYSTEMINFO_API_URL") || SYSTEMINFO_API_URL;
-  let CUSTOM_EVENT_INDEXER_API_URL =
-    getLocalStorageItem("CUSTOM_EVENT_INDEXER_API_URL") ||
-    EVENT_INDEXER_API_URL;
-
-  function enableExpertMode() {
-    expertMode = true;
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 },
-    });
-  }
 
   // Initialize the web3 RPC connections with error handling to see if we have provided a valid RPC provider
   async function initConnections() {
@@ -97,7 +76,6 @@
 
     const myNodePromise = initializeRPCConnection(CUSTOM_MYNODE_API_URL);
     const ethRPCPromise = initializeRPCConnection(CUSTOM_ETH_RPC_API_URL);
-    const L2TaikoRPCPromise = initializeRPCConnection(L2_TAIKO_RPC_API_URL);
 
     // Start connections concurrently
     const myNodeResponse = Promise.race([
@@ -107,11 +85,6 @@
 
     const ethRPCResponse = Promise.race([
       ethRPCPromise,
-      new Promise(resolve => setTimeout(resolve, timeout, { web3Instance: null, fetchErrorBoolean: true }))
-    ]);
-
-    const L2TaikoRPCResponse = Promise.race([
-      L2TaikoRPCPromise,
       new Promise(resolve => setTimeout(resolve, timeout, { web3Instance: null, fetchErrorBoolean: true }))
     ]);
 
@@ -129,13 +102,6 @@
       if (fetchEthRPCError)
         console.error(`Error while connecting to the ETHEREUM RPC ${CUSTOM_ETH_RPC_API_URL}. Double check the url in the connections tab.`);
     });
-
-    L2TaikoRPCResponse.then((response: any) => {
-      L2TaikoRPC = response.web3Instance;
-      fetchL2TaikoRPCError = response.fetchErrorBoolean;
-      if (fetchL2TaikoRPCError)
-        console.error(`Error while connecting to the TAIKO RPC ${L2_TAIKO_RPC_API_URL}. Looks like something is wrong with the official Taiko L2 RPC, check in the discord if this issue persists.`);
-    });
   }
 
   // Prometheus metric
@@ -147,14 +113,10 @@
   let gasPrice;
   let syncingStatus;
   let syncingProgress = 0;
-  let customAddressL1 = getLocalStorageItem("customAddressL1");
-  let customAddressL2 = getLocalStorageItem("customAddressL2");
+  let customAddress = getLocalStorageItem("customAddress");
 
   // TODO: remove 'any' types
-  let L1Balance;
-  let L2Balance;
-  let addressBlockProposedCount;
-  let addressBlockProvenCount;
+  let Balance;
   let nodeType = NodeTypes.Node;
 
   if (getLocalStorageItem("nodeType")) {
@@ -170,35 +132,29 @@
   // fetch general metrics from the node RPCs
   async function fetchMetrics() {
     try {
-      // Check if there was an error with the ETH RPC and L2 Taiko RPC connection, before fetching data
-      if (!fetchEthRPCError && !fetchL2TaikoRPCError) {
+      // Check if there was an error with the ETH RPC connection, before fetching data
+      if (!fetchEthRPCError) {
         gasPrice = Number(
+          // TODO: Use our own RPC when we are synced
           ethRPC?.utils.fromWei(await ethRPC?.eth.getGasPrice(), "gwei"),
         );
 
-        if(customAddressL1 && customAddressL2){
-          L1Balance = Number(
+        if(customAddress){
+          Balance = Number(
             ethRPC?.utils.fromWei(
-              await ethRPC?.eth.getBalance(customAddressL1),
+              await ethRPC?.eth.getBalance(customAddress),
               "ether",
             ),
           ).toFixed(4);
-
-          // Use the taiko RPC to be reliable, a node that's not synced will display false numbers
-          L2Balance = Number(L2TaikoRPC?.utils.fromWei(
-              await L2TaikoRPC?.eth.getBalance(customAddressL2),
-              "ether",
-            )).toFixed(4);
         }
       } else {
-        L1Balance = null;
-        L2Balance = null;
+        Balance = null;
         gasPrice = null;
       }
 
-      // If there was an error with the Node or L2TaikoRPC, return and set the syncingStatus to null so the progress bar reads 'node not found'
+      // If there was an error with the Node, return and set the syncingStatus to null so the progress bar reads 'node not found'
       // This way there aren't made any more calls to offline RPC's before the connection is stable again
-      if(fetchMyNodeError || fetchL2TaikoRPCError){
+      if(fetchMyNodeError){
         syncingStatus = null;
         return;
       }
@@ -206,11 +162,11 @@
       nodeHeight = await myNode.eth.getBlockNumber();
       // set the startNodeHeight once
       if(startNodeHeight === undefined) startNodeHeight = nodeHeight;
-      chainHeight = await L2TaikoRPC.eth.getBlockNumber();
+      chainHeight = await ethRPC.eth.getBlockNumber();
 
       /*
         Workaround to fix the initial 5mins where the node displays as synced but it hasn't even started syncing yet
-        check if there is a huge difference between myNode blocknumber and taiko rpc blocknumber while it's showing as not syncing
+        check if there is a huge difference between myNode blocknumber and eth rpc blocknumber while it's showing as not syncing
       */
       if (
         chainHeight - nodeHeight > 100 &&
@@ -248,37 +204,6 @@
       syncingStatus = null;
     }
   }
-
-  const fetchAddressEvents = async () => {
-    // Fetch Amount Of blocks proposed/proven, so if nodeType is regular node return and do nothing
-    fetchEventIndexerError = false;
-    if (nodeType === NodeTypes.Node) return;
-
-    const event = nodeType === NodeTypes.Proposer ? "BlockProposed" : nodeType === NodeTypes.Prover ? "BlockProven" : "";
-    const eventIndexerEventURL = `${CUSTOM_EVENT_INDEXER_API_URL}/eventByAddress?address=${customAddressL1}&event=${event}`;
-
-    try {
-      const response = await fetch(eventIndexerEventURL);
-
-      if (response.status === 200) {
-        const addressEvent = await response.json();
-
-      if (nodeType === NodeTypes.Proposer) addressBlockProposedCount = addressEvent.count;
-      else if (nodeType === NodeTypes.Prover) addressBlockProvenCount = addressEvent.count;
-
-        fetchEventIndexerError = false;
-      } else {
-        fetchEventIndexerError = true;
-        throw new Error("couldn't reach the eventindexer url");
-      }
-    } catch (error) {
-      fetchEventIndexerError = true;
-      console.error(
-        `Error fetching address events for the ${nodeType} at ${eventIndexerEventURL}`,
-        error,
-      );
-    }
-  };
 
   // fetch from the nodejs api that exposes system metrics using the npm package systeminformation
   async function fetchSystemInfo() {
@@ -344,7 +269,7 @@
     }
   }
 
-  // switching the nodetype, rotates the taiko logo and reveals/hides certain cards
+  // switching the nodetype reveals/hides certain cards
   function switchNodeType(type) {
     if (nodeType === type) return;
 
@@ -352,11 +277,8 @@
       case NodeTypes.Node:
         nodeType = NodeTypes.Node;
         break;
-      case NodeTypes.Proposer:
-        nodeType = NodeTypes.Proposer;
-        break;
-      case NodeTypes.Prover:
-        nodeType = NodeTypes.Prover;
+      case NodeTypes.Validator:
+        nodeType = NodeTypes.Validator;
         break;
       default:
         break;
@@ -366,39 +288,22 @@
   }
 
   onMount(async () => {
-    url = window.location.href;
-    // override the current params with urlParams if user provides an IP param
-    // example url: http://.../?ip=192.168.1.1&nodePort=8546&prometheusPort=9090
-    if (urlParams.has("ip")) {
-      const ip = urlParams.get("ip");
-      const nodePort = urlParams.get("nodePort") || 8548;
-      const prometheusPort = urlParams.get("prometheusPort") || 9091;
-      const systeminformationPort =
-        urlParams.get("systeminformationPort") || 3009;
-
-      CUSTOM_MYNODE_API_URL = `ws://${ip}:${nodePort}`;
-      CUSTOM_PROMETHEUS_API_URL = `http://${ip}:${prometheusPort}`;
-      CUSTOM_SYSTEMINFO_API_URL = `http://${ip}:${systeminformationPort}`;
-    }
-
     // Initialize the RPC connections
     await initConnections();
 
-    // Interval to fetch metrics every 5 seconds
+    // Interval to fetch metrics every 30 seconds
     intervalTimer = setInterval(async () => {
       try {
-        // TODO: add if checks for the fetchMyNodeError etc. before fetching data
         fetchMetrics();
         fetchSystemInfo();
         fetchPrometheus();
-        fetchAddressEvents();
 
         // If there were errors connecting to node, we will occasionally re-try initializing the RPC connections
         if (fetchMyNodeError) initConnections();
       } catch (e) {
         console.error(e);
       }
-    }, 5000);
+    }, 30000);
   });
 
   onDestroy(() => {
@@ -407,26 +312,13 @@
 </script>
 
 <div class="flex flex-col items-center">
-  <div class="text-center relative pt-4 md:pt-10">
+  <div class="text-center relative pt-14 md:pt-10">
     <section>
       <div class="mx-auto relative">
         <span>
           <span class="text-[#5CAA80] font-bold">dojo</span>
           <img src={dojoScrollIcon} class="icon-big m-auto" alt="dojo flag">
-          {#if url?.startsWith('http://dashboard.dojonode.xyz') || url?.startsWith('http://hekla.dojonode.xyz') || url?.startsWith('https://dashboard.dojonode.xyz') || url?.startsWith('https://hekla.dojonode.xyz')}
-            <div>
-              <select id="networkDropdown" class="mt-2 px-3 py-1 rounded-full" bind:value={selected} on:change={handleNavigation}>
-                <option value="mainnet">mainnet</option>
-                <option value="hekla">hekla</option>
-              </select>
-            </div>
-          {/if}
         </span>
-
-        <div class="card md:absolute md:top-0 md:left-36 w-max text-balance md:text-left mt-8 mb-2 max-w-[20rem]">
-          <h1 class="font-bold">node dashboard</h1>
-          <h2 class="-mt-2">the main training area</h2>
-        </div>
       </div>
     </section>
 
@@ -437,13 +329,8 @@
       >
       <span class="bar">|</span>
       <button
-        class:active={nodeType === NodeTypes.Proposer}
-        on:click={() => switchNodeType(NodeTypes.Proposer)}>proposer</button
-      >
-      <span class="bar">|</span>
-      <button
-        class:active={nodeType === NodeTypes.Prover}
-        on:click={() => switchNodeType(NodeTypes.Prover)}>prover</button
+        class:active={nodeType === NodeTypes.Validator}
+        on:click={() => switchNodeType(NodeTypes.Validator)}>validator</button
       >
     </div>
   </div>
@@ -502,11 +389,12 @@
       id="cards"
       class="mt-[1px] flex flex-wrap justify-center overflow-y-clip"
     >
+    <!-- TODO: make this dynamic, try to fetch the information from the node? -->
       <ChainCard
         title="chain"
-        body="taiko"
+        body="ethereum"
         subBody="mainnet"
-        icon={nodeTaikoIcon}
+        icon={ethIcon}
       />
       <Card
         title="memory"
@@ -559,39 +447,6 @@
         icon={timerclockIcon}
         loadingbar={false}
       />
-      <!-- node is either a prover or a proposer -->
-      {#if nodeType === NodeTypes.Proposer || nodeType === NodeTypes.Prover}
-        <Card
-          title="wallet"
-          body={L1Balance}
-          bodyMetricType={MetricTypes.ethereum}
-          subBody={L2Balance}
-          subBodyMetricType={MetricTypes.ethereum}
-          icon={purseIcon}
-          loadingbar={false}
-          {customAddressL1}
-          {customAddressL2}
-        />
-      {/if}
-      <!-- node is a proposer -->
-      {#if nodeType === NodeTypes.Proposer}
-        <Card
-          title="proposed"
-          body={addressBlockProposedCount}
-          bodyMetricType={MetricTypes.proposer}
-          icon={packageIcon}
-          loadingbar={false}
-        />
-        <!-- node is a prover -->
-      {:else if nodeType === NodeTypes.Prover}
-        <Card
-          title="proven"
-          body={addressBlockProvenCount}
-          bodyMetricType={MetricTypes.prover}
-          icon={abacusIcon}
-          loadingbar={false}
-        />
-      {/if}
       <Card
         title="gas"
         body={gasPrice}
@@ -619,31 +474,6 @@
       class="connections grid grid-cols-1 gap-6 mx-5 my-10 max-h-96 overflow-y-auto text-[hsl(var(--twc-textColor))]"
       slot="body"
     >
-
-    {#if url.startsWith('https://dashboard.dojonode.xyz') }
-      <div class="flex items-center">
-        <img
-        src={warningIcon}
-        alt="icon"
-        class="w-[30px] h-[30px] mr-2"
-        />
-        <div>
-          it seems like you are using the 'https' version of the hosted dashboard. This will not connect to your node, make sure to use <a class="underline" href="http://dashboard.dojonode.xyz">http://dashboard.dojonode.xyz</a> or <a target="_blank" class="underline" href="https://github.com/dojonode/taiko-node-dashboard-docker/">try selfhosting the dashboard</a>
-        </div>
-      </div>
-    {:else if url.startsWith('https://hekla.dojonode.xyz')}
-    <div class="flex items-center">
-      <img
-      src={warningIcon}
-      alt="icon"
-      class="w-[30px] h-[30px] mr-2"
-      />
-      <div>
-        it seems like you are using the 'https' version of the hosted dashboard. This will not connect to your node, make sure to use <a class="underline" href="http://hekla.dojonode.xyz">http://hekla.dojonode.xyz</a> or <a target="_blank" class="underline" href="https://github.com/dojonode/taiko-node-dashboard-docker/">try selfhosting the dashboard</a>
-      </div>
-    </div>
-    {/if}
-
       <div
         class="flex sm:flex-row flex-col justify-between items-center font-bold"
       >
@@ -652,11 +482,9 @@
           <input
               class="shadow appearance-none rounded w-full py-2 px-3 focus:outline-none focus:shadow-outline leading-none"
               type="text"
-              bind:value={customAddressL1}
+              bind:value={customAddress}
               on:keyup={() => {
-                setLocalStorageItem("customAddressL1", customAddressL1.trim());
-                customAddressL2 = customAddressL1;
-                setLocalStorageItem("customAddressL2", customAddressL2.trim());
+                setLocalStorageItem("customAddress", customAddress.trim());
               }}
             />
         </div>
@@ -754,34 +582,6 @@
           />
           <img
             src={fetchEthRPCError ? warningIcon : checkmarkIcon}
-            alt="icon"
-            class="w-[30px] ml-2"
-          />
-        </div>
-      </div>
-
-      <div
-        class="{expertMode
-          ? "flex"
-          : "hidden"} sm:flex-row flex-col justify-between items-center font-bold"
-      >
-        Event Indexer:
-        <div class="ml-2 w-72 flex items-center">
-          <input
-            class="shadow appearance-none rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline mb-1"
-            type="text"
-            bind:value={CUSTOM_EVENT_INDEXER_API_URL}
-            placeholder={EVENT_INDEXER_API_URL}
-            on:change={() => {
-              setLocalStorageItem(
-                "CUSTOM_EVENT_INDEXER_API_URL",
-                CUSTOM_EVENT_INDEXER_API_URL,
-              );
-              initConnections();
-            }}
-          />
-          <img
-            src={fetchEventIndexerError ? warningIcon : checkmarkIcon}
             alt="icon"
             class="w-[30px] ml-2"
           />
@@ -890,11 +690,6 @@
   }
   .icon-big {
 		width: 100px;
-	}
-  .card {
-		background-color: hsl(var(--twc-cardBackgroundColor));
-		border-radius: 30px;
-		padding: 10px 20px;
 	}
 
   #networkDropdown{

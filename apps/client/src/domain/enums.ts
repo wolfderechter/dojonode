@@ -4,7 +4,6 @@ export const MetricTypes = {
   megabyte: "MB",
   peers: "connected",
   ethereum: "ETH",
-  taiko: "TKO",
   hours: "hours",
   minutes: "minutes",
   blockheight: "blocks",
@@ -16,8 +15,7 @@ export const MetricTypes = {
 
 export const NodeTypes = {
   Node: "node",
-  Proposer: "proposer",
-  Prover: "prover",
+  Validator: "validator",
 };
 
 export const Themes = {

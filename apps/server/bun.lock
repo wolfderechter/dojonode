@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "@wolfderechter/taiko-node-systeminfo",
+      "name": "@wolfderechter/dojonode-server",
       "dependencies": {
         "cors": "^2.8.5",
         "express": "^4.21.0",

@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "@wolfderechter/taiko-node-dashboard",
+      "name": "@wolfderechter/dojonode-client",
       "dependencies": {
         "buffer": "^6.0.3",
         "canvas-confetti": "^1.9.3",
