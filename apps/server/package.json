@@ -1,11 +1,11 @@
 {
   "name": "@wolfderechter/dojonode-server",
-  "version": "1.0.2",
+  "version": "0.0.1",
   "description": "",
   "main": "server.js",
   "keywords": [],
   "author": "wolfderechter",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.21.0",
