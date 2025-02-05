@@ -36,7 +36,7 @@
     ETH_RPC_API_URL,
     MYNODE_API_URL,
     PROMETHEUS_API_URL,
-    SYSTEMINFO_API_URL,
+    DOJONODE_SERVER_API_URL,
   } from "../domain/constants";
 
   let selected = 'mainnet'
@@ -54,11 +54,12 @@
       fetchEventIndexerError;
 
   // Syncing estimation
-  let startNodeHeight;
+  // TODO: define types instead of any
+  let startNodeHeight: any;
   let startTime = Date.now();
   let currentNodeheight;
-  let currentTime;
-  let estimatedSyncingTime;
+  let currentTime: any;
+  let estimatedSyncingTime: any;
 
   // if custom localstorage API urls exist, use those, else use the default variables from the constants.ts file
   let CUSTOM_ETH_RPC_API_URL =
@@ -67,8 +68,8 @@
     getLocalStorageItem("CUSTOM_MYNODE_API_URL") || MYNODE_API_URL;
   let CUSTOM_PROMETHEUS_API_URL =
     getLocalStorageItem("CUSTOM_PROMETHEUS_API_URL") || PROMETHEUS_API_URL;
-  let CUSTOM_SYSTEMINFO_API_URL =
-    getLocalStorageItem("CUSTOM_SYSTEMINFO_API_URL") || SYSTEMINFO_API_URL;
+  let CUSTOM_DOJONODE_SERVER_API_URL =
+    getLocalStorageItem("CUSTOM_SYSTEMINFO_API_URL") || DOJONODE_SERVER_API_URL;
 
   // Initialize the web3 RPC connections with error handling to see if we have provided a valid RPC provider
   async function initConnections() {
@@ -208,7 +209,7 @@
   // fetch from the nodejs api that exposes system metrics using the npm package systeminformation
   async function fetchSystemInfo() {
     try {
-      const response = await fetch(`${CUSTOM_SYSTEMINFO_API_URL}/metrics`);
+      const response = await fetch(`${CUSTOM_DOJONODE_SERVER_API_URL}/metrics`);
       const systemInfo: Systeminfo = await response.json();
 
       const mem = systemInfo.mem;
@@ -522,12 +523,12 @@
           <input
             class="shadow appearance-none rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
             type="text"
-            bind:value={CUSTOM_SYSTEMINFO_API_URL}
-            placeholder={SYSTEMINFO_API_URL}
+            bind:value={CUSTOM_DOJONODE_SERVER_API_URL}
+            placeholder={DOJONODE_SERVER_API_URL}
             on:change={() => {
               setLocalStorageItem(
                 "CUSTOM_SYSTEMINFO_API_URL",
-                CUSTOM_SYSTEMINFO_API_URL,
+                CUSTOM_DOJONODE_SERVER_API_URL,
               );
             }}
           />
