@@ -2,7 +2,6 @@
   import { onDestroy, onMount } from "svelte";
   import * as simpleDuration from "simple-duration";
   import { queryPrometheus } from "../utils/prometheus";
-  import { initializeRPCConnection } from "../utils/connection";
   import {
     setLocalStorageItem,
     getLocalStorageItem,
@@ -71,40 +70,6 @@
   let CUSTOM_DOJONODE_SERVER_API_URL =
     getLocalStorageItem("CUSTOM_SYSTEMINFO_API_URL") || DOJONODE_SERVER_API_URL;
 
-  // Initialize the web3 RPC connections with error handling to see if we have provided a valid RPC provider
-  async function initConnections() {
-    const timeout = 5000; // Set your maximum time in milliseconds
-
-    const myNodePromise = initializeRPCConnection(CUSTOM_MYNODE_API_URL);
-    const ethRPCPromise = initializeRPCConnection(CUSTOM_ETH_RPC_API_URL);
-
-    // Start connections concurrently
-    const myNodeResponse = Promise.race([
-      myNodePromise,
-      new Promise(resolve => setTimeout(resolve, timeout, { web3Instance: null, fetchErrorBoolean: true }))
-    ]);
-
-    const ethRPCResponse = Promise.race([
-      ethRPCPromise,
-      new Promise(resolve => setTimeout(resolve, timeout, { web3Instance: null, fetchErrorBoolean: true }))
-    ]);
-
-    // Set the web3 RPC instances and handle errors
-    myNodeResponse.then((response: any) => {
-      myNode = response.web3Instance;
-      fetchMyNodeError = response.fetchErrorBoolean;
-      if (fetchMyNodeError)
-        console.error(`Error while connecting to the NODE RPC at ${CUSTOM_MYNODE_API_URL}. The node IP address or port might be wrong. Or the port might be blocked by a firewall.`);
-    });
-
-    ethRPCResponse.then((response: any) => {
-      ethRPC = response.web3Instance;
-      fetchEthRPCError = response.fetchErrorBoolean;
-      if (fetchEthRPCError)
-        console.error(`Error while connecting to the ETHEREUM RPC ${CUSTOM_ETH_RPC_API_URL}. Double check the url in the connections tab.`);
-    });
-  }
-
   // Prometheus metric
   let peers = null;
 
@@ -115,9 +80,6 @@
   let syncingStatus;
   let syncingProgress = 0;
   let customAddress = getLocalStorageItem("customAddress");
-
-  // TODO: remove 'any' types
-  let Balance;
   let nodeType = NodeTypes.Node;
 
   if (getLocalStorageItem("nodeType")) {
@@ -133,23 +95,17 @@
   // fetch general metrics from the node RPCs
   async function fetchMetrics() {
     try {
-      // Check if there was an error with the ETH RPC connection, before fetching data
-      if (!fetchEthRPCError) {
-        gasPrice = Number(
-          // TODO: Use our own RPC when we are synced
-          ethRPC?.utils.fromWei(await ethRPC?.eth.getGasPrice(), "gwei"),
-        );
-
-        if(customAddress){
-          Balance = Number(
-            ethRPC?.utils.fromWei(
-              await ethRPC?.eth.getBalance(customAddress),
-              "ether",
-            ),
-          ).toFixed(4);
+      try {
+        // Fetch gas price
+        const gasPriceResponse = await fetch(CUSTOM_DOJONODE_SERVER_API_URL + "/api/gasPrice");
+        if (gasPriceResponse.ok) {
+          const gasPriceData = await gasPriceResponse.json();
+          gasPrice = gasPriceData.gasPrice;
+        } else {
+          gasPrice = null;
         }
-      } else {
-        Balance = null;
+      } catch (error) {
+        console.error("Error fetching metrics:", error);
         gasPrice = null;
       }
 
@@ -262,14 +218,6 @@
     }
   };
 
-  function handleNavigation() {
-    if (selected === 'mainnet') {
-      window.location.href = "http://dashboard.dojonode.xyz";
-    } else if (selected === 'hekla') {
-      window.location.href = "http://hekla.dojonode.xyz";
-    }
-  }
-
   // switching the nodetype reveals/hides certain cards
   function switchNodeType(type) {
     if (nodeType === type) return;
@@ -289,18 +237,12 @@
   }
 
   onMount(async () => {
-    // Initialize the RPC connections
-    await initConnections();
-
     // Interval to fetch metrics every 30 seconds
     intervalTimer = setInterval(async () => {
       try {
         fetchMetrics();
         fetchSystemInfo();
         fetchPrometheus();
-
-        // If there were errors connecting to node, we will occasionally re-try initializing the RPC connections
-        if (fetchMyNodeError) initConnections();
       } catch (e) {
         console.error(e);
       }
@@ -505,7 +447,6 @@
                 "CUSTOM_MYNODE_API_URL",
                 CUSTOM_MYNODE_API_URL,
               );
-              initConnections();
             }}
           />
           <img
@@ -578,7 +519,6 @@
                 "CUSTOM_ETH_RPC_API_URL",
                 CUSTOM_ETH_RPC_API_URL,
               );
-              initConnections();
             }}
           />
           <img
