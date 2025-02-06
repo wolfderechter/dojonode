@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { onMount, tick } from "svelte";
   export let progress: number = null;
   export let precision: number = null;
+  export let syncingState;
   export let showPercentage: boolean = null;
   export let finishedMessage: string = null;
   export let widthPercentage: number = null;
@@ -15,14 +15,14 @@
   <div class="progress-bar__background">
     {#if showPercentage}
       <div class="progress-bar__text">
-        <!-- If there is a finishedMessage we show the progress percentage untill we it's finished, then we show the finishedMessage -->
-        {#if finishedMessage}
-          {progress < 100 && progress >= 0
-            ? progress.toFixed(precision) + "%"
-            : finishedMessage}
+        {#if syncingState === "succes" }
+            synced!
+        {:else if syncingState === "syncing"}
+            {progress.toFixed(2) + "%"}
+        {:else if syncingState === "error"}
+            something went wrong
         {:else}
-          <!-- If there is no finishedMessage we only display the progress percentage -->
-          {progress + "%"}
+            loading...
         {/if}
       </div>
     {/if}
