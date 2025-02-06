@@ -4,13 +4,17 @@ const cors = require("cors");
 const app = express();
 const port = 3009;
 
+const PROMETHEUS_API_URL = "localhost:9090";
+const MYNODE_API_URL = "http://localhost:8545";
+const ETH_RPC_API_URL = "https://ethereum-rpc.publicnode.com";
+
 // Start new timer on startup, to keep track of runtime
-const startTime = Math.floor(new Date() / 1000);
+const startTime = new Date();
 
 app.use(
   cors({
     origin: "*",
-  })
+  }),
 );
 
 app.get("/systemMetrics", async (_req, res) => {
@@ -40,5 +44,5 @@ app.get("/generalMetrics", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Metrics API listening at http://localhost:${port}/metrics`);
+  console.log(`Dojonode-server API listening at http://localhost:${port}`);
 });
