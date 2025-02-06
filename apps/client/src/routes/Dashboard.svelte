@@ -162,7 +162,7 @@
 
   // switching the nodetype reveals/hides certain cards
   function switchNodeType(type) {
-    if (nodeType === type) return;
+    if (nodeType === type) return; // exit if nodeType is the same as the currently selected type
 
     switch (type) {
       case NodeTypes.Node:
