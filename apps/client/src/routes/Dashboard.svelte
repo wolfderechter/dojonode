@@ -112,10 +112,10 @@
 
       const mem = systemInfo.mem;
       const disk = systemInfo.disk[0];
-      const currentTime = Math.floor(Date.now() / 1000);
-      const secondsElapsed = currentTime - systemInfo.startTime;
+      const currentTime = Date.now();
+      const secondsElapsed = Math.abs(currentTime - systemInfo.startTime) / 1000;
       const runtimeInHours = secondsElapsed / 3600;
-      const runtime = runtimeInHours >= 1 ? runtimeInHours : runtimeInHours * 60;
+      const runtime = runtimeInHours >= 1 ? runtimeInHours : runtimeInHours * 60; // if runTime < 1 hour, show it in minutes
 
       systeminformationMetrics = {
         memUsedGB: Number(((mem.total - mem.available) / 1024 / 1024 / 1024).toFixed(2)),

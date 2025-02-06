@@ -9,7 +9,7 @@ const MYNODE_API_URL = "http://localhost:8545";
 const ETH_RPC_API_URL = "https://ethereum-rpc.publicnode.com";
 
 // Start new timer on startup, to keep track of runtime
-const startTime = new Date();
+const startTime = Date.now();
 
 app.use(
   cors({
