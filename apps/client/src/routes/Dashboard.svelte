@@ -9,7 +9,7 @@
   import Card from "../components/Card.svelte";
   import ChainCard from "../components/ChainCard.svelte";
   import ThemeSwitcher from "../components/ThemeSwitcher.svelte";
-  import Progressbar from "../components/Progressbar.svelte";
+  import SyncProgressbar from "../components/SyncProgressbar.svelte";
   import purseIcon from "../assets/icons/Purse.avif";
   import heartIcon from "../assets/icons/Heart.avif";
   import brainIcon from "../assets/icons/Brain.avif";
@@ -220,22 +220,12 @@
   </div>
 
   <!-- Progress Bar -->
-  <!--
-    the progress can only be displayed if the syncingrequest has been made and the node can be found
-    -> first check if the request was made: !== undefined
-    -> check if the node is found: !== null
-    -> check if the node is syncing: syncingStatus === true
-
-    use a -1 value to display the loading or node not found values
-   -->
   <div class="my-4 text-center">
-    <Progressbar
+    <SyncProgressbar
       syncingState={syncingState}
       progress={syncingProgress}
-      precision={2}
-      showPercentage={true}
     />
-    {#if estimatedSyncingTime && syncingState === 'syncing'}
+    {#if estimatedSyncingTime && syncingState === "syncing"}
       <span class="text-[12px] text-[hsl(var(--twc-cardSubBodyColor))]"
         >{estimatedSyncingTime}</span
       >

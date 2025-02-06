@@ -1,9 +1,6 @@
 <script lang="ts">
   export let progress: number = null;
-  export let precision: number = null;
-  export let syncingState;
   export let showPercentage: boolean = null;
-  export let finishedMessage: string = null;
   export let widthPercentage: number = null;
   export let heightPixels: number = null;
 </script>
@@ -15,15 +12,9 @@
   <div class="progress-bar__background">
     {#if showPercentage}
       <div class="progress-bar__text">
-        {#if syncingState === "succes" }
-            synced!
-        {:else if syncingState === "syncing"}
-            {progress.toFixed(2) + "%"}
-        {:else if syncingState === "error"}
-            something went wrong
-        {:else}
-            loading...
-        {/if}
+        <slot {progress} >
+          {progress.toFixed(2)}%
+        </slot>
       </div>
     {/if}
   </div>
