@@ -13,7 +13,7 @@ app.use(
   })
 );
 
-app.get("/metrics", async (_req, res) => {
+app.get("/systemMetrics", async (_req, res) => {
   const mem = await si.mem();
   const cpu = await si.currentLoad();
   const disk = await si.fsSize();
@@ -29,8 +29,14 @@ app.get("/metrics", async (_req, res) => {
 });
 
 // TODO: Send request to the node
-app.get("/api/gasPrice", async (req, res) => {
-  res.json("5");
+app.get("/generalMetrics", async (req, res) => {
+  res.json({
+    gasPrice: 5,
+    peers: 10,
+    nodeHeight: 1100,
+    chainHeight: 1200,
+    syncingState: "error", // TODO: use enum, union or whatever works best succes/syncing/error
+  });
 });
 
 app.listen(port, () => {
