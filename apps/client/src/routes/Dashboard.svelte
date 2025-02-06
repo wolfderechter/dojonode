@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import * as simpleDuration from "simple-duration";
-  import { queryPrometheus } from "../utils/prometheus";
   import {
     setLocalStorageItem,
     getLocalStorageItem,
@@ -38,16 +37,11 @@
     DOJONODE_SERVER_API_URL,
   } from "../domain/constants";
 
-  let selected = 'mainnet'
-  let myNode;
-  let ethRPC;
-  let fetchSystemInfoError = false;
-  let fetchPrometheusError = false;
+  let fetchSystemMetricsError = false;
   let fetchMyNodeError = false;
   let fetchEthRPCError = false;
   let fetchEventIndexerError = false;
-  $:hasError = fetchSystemInfoError ||
-      fetchPrometheusError ||
+  $:hasError = fetchSystemMetricsError ||
       fetchMyNodeError ||
       fetchEthRPCError ||
       fetchEventIndexerError;
@@ -70,14 +64,13 @@
   let CUSTOM_DOJONODE_SERVER_API_URL =
     getLocalStorageItem("CUSTOM_SYSTEMINFO_API_URL") || DOJONODE_SERVER_API_URL;
 
-  // Prometheus metric
-  let peers = null;
 
   // General metrics
   let nodeHeight: number;
   let chainHeight;
   let gasPrice;
-  let syncingStatus;
+  let syncingState;
+  let peers = null;
   let syncingProgress = 0;
   let customAddress = getLocalStorageItem("customAddress");
   let nodeType = NodeTypes.Node;
@@ -93,79 +86,28 @@
   let connectionsOpen: boolean = false;
 
   // fetch general metrics from the node RPCs
-  async function fetchMetrics() {
+  async function fetchGeneralMetrics() {
     try {
-      try {
-        // Fetch gas price
-        const gasPriceResponse = await fetch(CUSTOM_DOJONODE_SERVER_API_URL + "/api/gasPrice");
-        if (gasPriceResponse.ok) {
-          const gasPriceData = await gasPriceResponse.json();
-          gasPrice = gasPriceData.gasPrice;
-        } else {
-          gasPrice = null;
-        }
-      } catch (error) {
-        console.error("Error fetching metrics:", error);
-        gasPrice = null;
-      }
+      const generalMetricsResponse = await fetch(CUSTOM_DOJONODE_SERVER_API_URL + "/generalMetrics");
+      if (generalMetricsResponse.ok) {
+        const data = await generalMetricsResponse.json();
 
-      // If there was an error with the Node, return and set the syncingStatus to null so the progress bar reads 'node not found'
-      // This way there aren't made any more calls to offline RPC's before the connection is stable again
-      if(fetchMyNodeError){
-        syncingStatus = null;
-        return;
-      }
-
-      nodeHeight = await myNode.eth.getBlockNumber();
-      // set the startNodeHeight once
-      if(startNodeHeight === undefined) startNodeHeight = nodeHeight;
-      chainHeight = await ethRPC.eth.getBlockNumber();
-
-      /*
-        Workaround to fix the initial 5mins where the node displays as synced but it hasn't even started syncing yet
-        check if there is a huge difference between myNode blocknumber and eth rpc blocknumber while it's showing as not syncing
-      */
-      if (
-        chainHeight - nodeHeight > 100 &&
-        (await myNode.eth.isSyncing()) === false
-      ) {
-        syncingStatus = undefined;
-      } else {
-        syncingStatus = await myNode.eth.isSyncing();
-      }
-      if (syncingStatus !== undefined && syncingStatus !== null) {
-        syncingProgress =
-          (syncingStatus.currentBlock / syncingStatus.highestBlock) * 100;
-      }
-
-      // Estimate how long until node is synced, but only if the nodeheight is more than 100 blocks behind the chainHeight
-      if (chainHeight - nodeHeight > 100) {
-        currentNodeheight = nodeHeight;
-        currentTime = Date.now();
-        const blocksDownloaded = Number(nodeHeight) - Number(startNodeHeight);
-        const blocksRemaining = Number(chainHeight) - Number(startNodeHeight);
-        const downloadProgress = blocksDownloaded / blocksRemaining;
-
-        //only calculate after 5s and when the downloadProgress is bigger than 0, to be more accurate
-        const timeElapsed = currentTime - startTime;
-        if (timeElapsed > 5000 && downloadProgress > 0) {
-          const estimatedTotalTime = timeElapsed / downloadProgress;
-          estimatedSyncingTime = simpleDuration.stringify(
-            estimatedTotalTime / 1000,
-            "m",
-          );
-        }
+        gasPrice = data.gasPrice;
+        peers = data.peers;
+        nodeHeight = data.nodeHeight;
+        chainHeight = data.chainHeight;
+        syncingState = data.syncingState;
       }
     } catch (error) {
-      console.error("Error while fetching RPC metrics", error);
-      syncingStatus = null;
+      console.error("Error fetching general metrics:", error);
     }
+    syncingProgress = (nodeHeight / chainHeight) * 100;
   }
 
   // fetch from the nodejs api that exposes system metrics using the npm package systeminformation
-  async function fetchSystemInfo() {
+  async function fetchSystemMetrics() {
     try {
-      const response = await fetch(`${CUSTOM_DOJONODE_SERVER_API_URL}/metrics`);
+      const response = await fetch(CUSTOM_DOJONODE_SERVER_API_URL + "/systemMetrics");
       const systemInfo: Systeminfo = await response.json();
 
       const mem = systemInfo.mem;
@@ -185,38 +127,38 @@
         runtime: Number(runtime.toFixed(0)),
         runtimeMetricType: runtimeInHours >= 1 ? MetricTypes.hours : MetricTypes.minutes,
       };
-      fetchSystemInfoError = false;
+      fetchSystemMetricsError = false;
     } catch (error) {
-      if (!fetchSystemInfoError) {
+      if (!fetchSystemMetricsError) {
         console.error("Error while fetching systeminfo", error);
-        fetchSystemInfoError = true;
+        fetchSystemMetricsError = true;
       }
     }
   }
 
   // Fetch from prometheus
-  const fetchPrometheus = async () => {
-    try {
-      const peersData = await queryPrometheus(
-        CUSTOM_PROMETHEUS_API_URL,
-        "p2p_peers",
-      );
+  // const fetchPrometheus = async () => {
+  //   try {
+  //     const peersData = await queryPrometheus(
+  //       CUSTOM_PROMETHEUS_API_URL,
+  //       "p2p_peers",
+  //     );
 
-      // Check if we can find the p2p_peers value in the result, throw error if response is undefined
-      if (peersData?.data?.result?.[0]?.value?.[1] === undefined)
-        throw new Error("Value p2p_peers not found in the Prometheus response");
+  //     // Check if we can find the p2p_peers value in the result, throw error if response is undefined
+  //     if (peersData?.data?.result?.[0]?.value?.[1] === undefined)
+  //       throw new Error("Value p2p_peers not found in the Prometheus response");
 
-      peers = peersData.data.result[0].value[1];
-      fetchPrometheusError = false;
-    } catch (error) {
-      peers = "";
+  //     peers = peersData.data.result[0].value[1];
+  //     fetchPrometheusError = false;
+  //   } catch (error) {
+  //     peers = "";
 
-      if (!fetchPrometheusError) {
-        console.error("Error while fetching prometheus", error);
-        fetchPrometheusError = true;
-      }
-    }
-  };
+  //     if (!fetchPrometheusError) {
+  //       console.error("Error while fetching prometheus", error);
+  //       fetchPrometheusError = true;
+  //     }
+  //   }
+  // };
 
   // switching the nodetype reveals/hides certain cards
   function switchNodeType(type) {
@@ -240,9 +182,8 @@
     // Interval to fetch metrics every 30 seconds
     intervalTimer = setInterval(async () => {
       try {
-        fetchMetrics();
-        fetchSystemInfo();
-        fetchPrometheus();
+        fetchGeneralMetrics();
+        fetchSystemMetrics();
       } catch (e) {
         console.error(e);
       }
@@ -289,22 +230,12 @@
    -->
   <div class="my-4 text-center">
     <Progressbar
-      progress={syncingStatus === undefined
-        ? (Number(nodeHeight) / Number(chainHeight)) * 100
-        : syncingStatus === null
-        ? -1
-        : syncingStatus
-        ? syncingProgress
-        : 100}
+      syncingState={syncingState}
+      progress={syncingProgress}
       precision={2}
       showPercentage={true}
-      finishedMessage={syncingStatus === undefined
-        ? "preparing to sync..."
-        : syncingStatus === null
-        ? "node not found"
-        : "synced!"}
     />
-    {#if estimatedSyncingTime && syncingStatus}
+    {#if estimatedSyncingTime && syncingState === 'syncing'}
       <span class="text-[12px] text-[hsl(var(--twc-cardSubBodyColor))]"
         >{estimatedSyncingTime}</span
       >
@@ -459,7 +390,7 @@
       <div
         class="flex sm:flex-row flex-col justify-between items-center font-bold"
       >
-        systeminformation
+      dojonode-server
         <div class="ml-2 w-72 flex items-center">
           <input
             class="shadow appearance-none rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
@@ -474,7 +405,7 @@
             }}
           />
           <img
-            src={fetchSystemInfoError ? warningIcon : checkmarkIcon}
+            src={fetchSystemMetricsError ? warningIcon : checkmarkIcon}
             alt="icon"
             class="w-[30px] ml-2"
           />
@@ -497,8 +428,9 @@
               );
             }}
           />
+          <!-- TODO: check if backend can reach prometheus? -->
           <img
-            src={fetchPrometheusError ? warningIcon : checkmarkIcon}
+            src={checkmarkIcon}
             alt="icon"
             class="w-[30px] ml-2"
           />
