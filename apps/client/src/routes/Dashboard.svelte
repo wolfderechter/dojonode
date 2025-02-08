@@ -9,7 +9,7 @@
   import Card from "../components/Card.svelte";
   import ChainCard from "../components/ChainCard.svelte";
   import ThemeSwitcher from "../components/ThemeSwitcher.svelte";
-  import SyncProgressbar from "../components/SyncProgressbar.svelte";
+  import SyncProgressbar from "../components/Progressbar/SyncProgressbar.svelte";
   import purseIcon from "../assets/icons/Purse.avif";
   import heartIcon from "../assets/icons/Heart.avif";
   import brainIcon from "../assets/icons/Brain.avif";

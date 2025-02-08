@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Progressbar from "./Progressbar.svelte";
+  import Progressbar from "./Progressbar/Progressbar.svelte";
   import { MetricTypes } from "../domain/enums";
 
   export let title: string = null;
