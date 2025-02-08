@@ -62,6 +62,6 @@ export interface Systeminfo {
     use: number;
     mount: string;
     rw: boolean;
-  };
+  }[];
   startTime: number;
 }

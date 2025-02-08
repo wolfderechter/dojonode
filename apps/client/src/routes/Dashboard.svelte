@@ -111,7 +111,8 @@
       const systemInfo: Systeminfo = await response.json();
 
       const mem = systemInfo.mem;
-      const disk = systemInfo.disk[0];
+      // find disk with biggest size, since that's probably the disk we care about
+      const disk = systemInfo.disk.sort((a, b) => b.size - a.size)[0];
       const currentTime = Date.now();
       const secondsElapsed = Math.abs(currentTime - systemInfo.startTime) / 1000;
       const runtimeInHours = secondsElapsed / 3600;
