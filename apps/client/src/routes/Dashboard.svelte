@@ -241,7 +241,7 @@
     </div>
     <button
       id="connectionsBtn"
-      class="w-6 h-6 absolute right-[7px] mr-[6px] top-[-37px] cursor-pointer"
+      class="w-[30px] h-[30px] absolute right-[7px] mr-[6px] top-[-37px] cursor-pointer"
       on:click={() => (connectionsOpen = true)}
     >
       <img
