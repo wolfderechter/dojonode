@@ -236,6 +236,9 @@
   <div
     class="max-w-[35rem] sticky sm:justify-center"
   >
+    <div class="left-[20px] top-[-37px] absolute">
+      <ThemeSwitcher />
+    </div>
     <button
       id="connectionsBtn"
       class="w-6 h-6 absolute right-[7px] mr-[6px] top-[-37px] cursor-pointer"
