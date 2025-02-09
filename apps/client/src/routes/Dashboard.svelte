@@ -37,15 +37,8 @@
     DOJONODE_SERVER_API_URL,
   } from "../domain/constants";
 
-  let fetchSystemMetricsError = false;
-  let fetchMyNodeError = false;
-  let fetchEthRPCError = false;
-  let fetchEventIndexerError = false;
-  $:hasError = fetchSystemMetricsError ||
-      fetchMyNodeError ||
-      fetchEthRPCError ||
-      fetchEventIndexerError;
-
+  // TODO: add error handling back in
+  let hasError = false;
   // Syncing estimation
   // TODO: define types instead of any
   let startNodeHeight: any;
@@ -128,12 +121,8 @@
         runtime: Number(runtime.toFixed(0)),
         runtimeMetricType: runtimeInHours >= 1 ? MetricTypes.hours : MetricTypes.minutes,
       };
-      fetchSystemMetricsError = false;
     } catch (error) {
-      if (!fetchSystemMetricsError) {
-        console.error("Error while fetching systeminfo", error);
-        fetchSystemMetricsError = true;
-      }
+      console.error("Error while fetching systeminfo", error);
     }
   }
 
@@ -188,7 +177,7 @@
       } catch (e) {
         console.error(e);
       }
-    }, 30000);
+    }, 3000);
   });
 
   onDestroy(() => {
@@ -375,7 +364,7 @@
             }}
           />
           <img
-            src={fetchMyNodeError ? warningIcon : checkmarkIcon}
+            src={checkmarkIcon}
             alt="icon"
             class="w-[30px] ml-2"
           />
@@ -399,7 +388,7 @@
             }}
           />
           <img
-            src={fetchSystemMetricsError ? warningIcon : checkmarkIcon}
+            src={checkmarkIcon}
             alt="icon"
             class="w-[30px] ml-2"
           />
@@ -448,7 +437,7 @@
             }}
           />
           <img
-            src={fetchEthRPCError ? warningIcon : checkmarkIcon}
+            src={checkmarkIcon}
             alt="icon"
             class="w-[30px] ml-2"
           />
