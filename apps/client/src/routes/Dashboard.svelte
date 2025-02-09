@@ -57,8 +57,8 @@
 
   // General metrics
   let nodeHeight: number = $state();
-  let chainHeight = $state();
-  let gasPrice = $state();
+  let chainHeight: number = $state();
+  let gasPrice: number = $state();
   let syncingState = $state();
   let peers = $state(null);
   let syncingProgress = $state(0);
@@ -291,7 +291,7 @@
     {#snippet body()}
         <div
         class="connections grid grid-cols-1 gap-6 mx-5 my-10 max-h-96 overflow-y-auto text-[hsl(var(--twc-textColor))]"
-        
+
       >
         <div
           class="flex sm:flex-row flex-col justify-between items-center font-bold"

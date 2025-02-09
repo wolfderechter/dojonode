@@ -16,11 +16,10 @@
     "lint:fix": "bunx eslint --fix './**/*.{ts,svelte}'"
   },
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^4.0.4",
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "@tsconfig/svelte": "^5.0.4",
     "@types/node": "^22.13.1",
     "autoprefixer": "^10.4.20",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
     "postcss": "^8.5.1",
     "postcss-cli": "^11.0.0",
     "postcss-loader": "^8.1.1",

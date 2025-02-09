@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import { VitePWA } from "vite-plugin-pwa";
+import { sveltePreprocess } from "svelte-preprocess";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -14,7 +15,9 @@ export default defineConfig({
     port: 5173,
   },
   plugins: [
-    svelte(),
+    svelte({
+      preprocess: [sveltePreprocess({ typescript: true })],
+    }),
     VitePWA({
       manifest: {
         name: "dojo node dashboard",
