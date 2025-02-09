@@ -20,8 +20,8 @@ export default defineConfig({
     }),
     VitePWA({
       manifest: {
-        name: "dojo node dashboard",
-        short_name: "dojo node",
+        name: "dojonode dashboard",
+        short_name: "dojonode",
         start_url: "./",
         display: "standalone",
         background_color: "#FFF9EB",
