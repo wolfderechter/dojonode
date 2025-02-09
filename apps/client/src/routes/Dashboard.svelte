@@ -25,7 +25,7 @@
   import ethIcon from "../assets/icons/Ethereum.avif";
   import { MetricTypes, NodeTypes } from "../domain/enums";
   import type {
-  Systeminfo,
+    Systeminfo,
     SysteminformationMetricsInterface,
   } from "../domain/types";
   import {
@@ -55,7 +55,6 @@
   let CUSTOM_DOJONODE_SERVER_API_URL =
     getLocalStorageItem("CUSTOM_SYSTEMINFO_API_URL") || DOJONODE_SERVER_API_URL;
 
-
   // General metrics
   let nodeHeight: number;
   let chainHeight;
@@ -79,7 +78,9 @@
   // fetch general metrics from the node RPCs
   async function fetchGeneralMetrics() {
     try {
-      const generalMetricsResponse = await fetch(CUSTOM_DOJONODE_SERVER_API_URL + "/generalMetrics");
+      const generalMetricsResponse = await fetch(
+        CUSTOM_DOJONODE_SERVER_API_URL + "/generalMetrics",
+      );
       if (generalMetricsResponse.ok) {
         const data = await generalMetricsResponse.json();
 
@@ -98,26 +99,37 @@
   // fetch from the nodejs api that exposes system metrics using the npm package systeminformation
   async function fetchSystemMetrics() {
     try {
-      const response = await fetch(CUSTOM_DOJONODE_SERVER_API_URL + "/systemMetrics");
+      const response = await fetch(
+        CUSTOM_DOJONODE_SERVER_API_URL + "/systemMetrics",
+      );
       const systemInfo: Systeminfo = await response.json();
 
       const mem = systemInfo.mem;
       // find disk with biggest size, since that's probably the disk we care about
       const disk = systemInfo.disk.sort((a, b) => b.size - a.size)[0];
       const currentTime = Date.now();
-      const secondsElapsed = Math.abs(currentTime - systemInfo.startTime) / 1000;
+      const secondsElapsed =
+        Math.abs(currentTime - systemInfo.startTime) / 1000;
       const runtimeInHours = secondsElapsed / 3600;
-      const runtime = runtimeInHours >= 1 ? runtimeInHours : runtimeInHours * 60; // if runTime < 1 hour, show it in minutes
+      const runtime =
+        runtimeInHours >= 1 ? runtimeInHours : runtimeInHours * 60; // if runTime < 1 hour, show it in minutes
 
       systeminformationMetrics = {
-        memUsedGB: Number(((mem.total - mem.available) / 1024 / 1024 / 1024).toFixed(2)),
-        memUsedPerc: Number((((mem.total - mem.available) / mem.total) * 100).toFixed(2)),
+        memUsedGB: Number(
+          ((mem.total - mem.available) / 1024 / 1024 / 1024).toFixed(2),
+        ),
+        memUsedPerc: Number(
+          (((mem.total - mem.available) / mem.total) * 100).toFixed(2),
+        ),
         cpuUsedPerc: Number(systemInfo.cpu.currentLoad.toFixed(2)),
-        filestorageFreeGB: Number(((disk.size - disk.used) / 1024 / 1024 / 1024).toFixed(2)),
+        filestorageFreeGB: Number(
+          ((disk.size - disk.used) / 1024 / 1024 / 1024).toFixed(2),
+        ),
         filestorageUsedGB: Number((disk.used / 1024 / 1024 / 1024).toFixed(2)),
         filestorageUsedPerc: Number(disk.use.toFixed(2)),
         runtime: Number(runtime.toFixed(0)),
-        runtimeMetricType: runtimeInHours >= 1 ? MetricTypes.hours : MetricTypes.minutes,
+        runtimeMetricType:
+          runtimeInHours >= 1 ? MetricTypes.hours : MetricTypes.minutes,
       };
     } catch (error) {
       console.error("Error while fetching systeminfo", error);
@@ -189,7 +201,7 @@
       <div class="mx-auto relative">
         <span>
           <span class="text-[#5CAA80] font-bold">dojo</span>
-          <img src={dojoScrollIcon} class="icon-big m-auto" alt="dojo flag">
+          <img src={dojoScrollIcon} class="icon-big m-auto" alt="dojo flag" />
         </span>
       </div>
     </section>
@@ -209,10 +221,7 @@
 
   <!-- Progress Bar -->
   <div class="my-4 text-center">
-    <SyncProgressbar
-      syncingState={syncingState}
-      progress={syncingProgress}
-    />
+    <SyncProgressbar {syncingState} progress={syncingProgress} />
     {#if estimatedSyncingTime && syncingState === "syncing"}
       <span class="text-[12px] text-[hsl(var(--twc-cardSubBodyColor))]"
         >{estimatedSyncingTime}</span
@@ -220,9 +229,7 @@
     {/if}
   </div>
 
-  <div
-    class="max-w-[35rem] sticky sm:justify-center"
-  >
+  <div class="max-w-[35rem] sticky sm:justify-center">
     <div class="left-[20px] top-[-37px] absolute">
       <ThemeSwitcher />
     </div>
@@ -233,9 +240,7 @@
     >
       <img
         src={antennaIcon}
-        class={hasError
-          ? "animateConnections"
-          : ""}
+        class={hasError ? "animateConnections" : ""}
         alt="antenna icon"
       />
     </button>
@@ -244,12 +249,8 @@
       id="cards"
       class="mt-[1px] flex flex-wrap justify-center overflow-y-clip"
     >
-    <!-- TODO: make this dynamic, try to fetch the information from the node? -->
-      <ChainCard
-        body="ethereum"
-        subBody="mainnet"
-        icon={ethIcon}
-      />
+      <!-- TODO: make this dynamic, try to fetch the information from the node? -->
+      <ChainCard body="ethereum" subBody="mainnet" icon={ethIcon} />
       <MemoryCard
         body={systeminformationMetrics?.memUsedGB}
         subBody={systeminformationMetrics?.memUsedPerc}
@@ -264,20 +265,13 @@
         subBody={systeminformationMetrics?.filestorageUsedPerc}
         progress={systeminformationMetrics?.filestorageUsedPerc}
       />
-      <NodeheightCard
-        body={nodeHeight}
-        subBody={chainHeight}
-      />
-      <PeersCard
-        body={peers}
-      />
+      <NodeheightCard body={nodeHeight} subBody={chainHeight} />
+      <PeersCard body={peers} />
       <RuntimeCard
         body={systeminformationMetrics?.runtime}
         subBody={systeminformationMetrics?.runtimeMetricType}
       />
-      <GasCard
-        body={gasPrice}
-      />
+      <GasCard body={gasPrice} />
       <!-- Invisible cards that push any incomplete rows of cards to the left -->
       <div class="invisible h-5">
         <Card />
@@ -304,13 +298,13 @@
         address
         <div class="ml-2 w-72 flex items-center">
           <input
-              class="shadow appearance-none rounded w-full py-2 px-3 focus:outline-none focus:shadow-outline leading-none"
-              type="text"
-              bind:value={customAddress}
-              on:keyup={() => {
-                setLocalStorageItem("customAddress", customAddress.trim());
-              }}
-            />
+            class="shadow appearance-none rounded w-full py-2 px-3 focus:outline-none focus:shadow-outline leading-none"
+            type="text"
+            bind:value={customAddress}
+            on:keyup={() => {
+              setLocalStorageItem("customAddress", customAddress.trim());
+            }}
+          />
         </div>
       </div>
       <div
@@ -330,17 +324,13 @@
               );
             }}
           />
-          <img
-            src={checkmarkIcon}
-            alt="icon"
-            class="w-[30px] ml-2"
-          />
+          <img src={checkmarkIcon} alt="icon" class="w-[30px] ml-2" />
         </div>
       </div>
       <div
         class="flex sm:flex-row flex-col justify-between items-center font-bold"
       >
-      dojonode-server
+        dojonode-server
         <div class="ml-2 w-72 flex items-center">
           <input
             class="shadow appearance-none rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
@@ -354,11 +344,7 @@
               );
             }}
           />
-          <img
-            src={checkmarkIcon}
-            alt="icon"
-            class="w-[30px] ml-2"
-          />
+          <img src={checkmarkIcon} alt="icon" class="w-[30px] ml-2" />
         </div>
       </div>
       <div
@@ -379,11 +365,7 @@
             }}
           />
           <!-- TODO: check if backend can reach prometheus? -->
-          <img
-            src={checkmarkIcon}
-            alt="icon"
-            class="w-[30px] ml-2"
-          />
+          <img src={checkmarkIcon} alt="icon" class="w-[30px] ml-2" />
         </div>
       </div>
       <div
@@ -403,11 +385,7 @@
               );
             }}
           />
-          <img
-            src={checkmarkIcon}
-            alt="icon"
-            class="w-[30px] ml-2"
-          />
+          <img src={checkmarkIcon} alt="icon" class="w-[30px] ml-2" />
         </div>
       </div>
     </div>
@@ -490,16 +468,15 @@
   section {
     color: hsl(var(--twc-textColor));
     display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		flex: 0.6;
-		width: 50%;
-		margin-left: auto;
-		margin-right: auto;
-		text-align: center;
-	}
-
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 0.6;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
 
   @media only screen and (max-width: 600px) {
     section {
@@ -512,6 +489,6 @@
     }
   }
   .icon-big {
-		width: 100px;
-	}
+    width: 100px;
+  }
 </style>
