@@ -2,17 +2,25 @@
   import Card from "./Card.svelte";
   import gasIcon from "../../assets/icons/Gas.avif";
 
-  export let body: number;
+  interface Props {
+    body: number;
+  }
+
+  let { body }: Props = $props();
 </script>
 
 <Card title="gas" icon={gasIcon}>
-  <div slot="body">
-    {#if body}
-      {body}
-    {/if}
-  </div>
+  {#snippet body()}
+    <div >
+      {#if body}
+        {body}
+      {/if}
+    </div>
+  {/snippet}
 
-  <div slot="subBody">
-      gwei
-  </div>
+  {#snippet subBody()}
+    <div >
+        gwei
+    </div>
+  {/snippet}
 </Card>

@@ -2,21 +2,29 @@
   import Card from "./Card.svelte";
   import brainIcon from "../../assets/icons/Brain.avif";
 
-  export let body: number;
-  export let subBody: number;
-  export let progress: number;
+  interface Props {
+    body: number;
+    subBody: number;
+    progress: number;
+  }
+
+  let { body, subBody, progress }: Props = $props();
 </script>
 
 <Card title="memory" icon={brainIcon} loadingbar={true} {progress}>
-  <div slot="body">
-    {#if body}
-      {body} GB
-    {/if}
-  </div>
+  {#snippet body()}
+    <div >
+      {#if body}
+        {body} GB
+      {/if}
+    </div>
+  {/snippet}
 
-  <div slot="subBody">
-    {#if subBody}
-      {subBody} %
-    {/if}
-  </div>
+  {#snippet subBody()}
+    <div >
+      {#if subBody}
+        {subBody} %
+      {/if}
+    </div>
+  {/snippet}
 </Card>

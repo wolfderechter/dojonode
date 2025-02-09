@@ -1,8 +1,19 @@
 <script lang="ts">
-  export let title: string = null;
-  export let isOpen: boolean = false;
-  export let onClose: () => void = null;
-  export let showXButton: boolean = true;
+  interface Props {
+    title?: string;
+    isOpen?: boolean;
+    onClose?: () => void;
+    showXButton?: boolean;
+    children?: import('svelte').Snippet;
+  }
+
+  let {
+    title = null,
+    isOpen = $bindable(false),
+    onClose = null,
+    showXButton = true,
+    children
+  }: Props = $props();
 
   const onCloseClicked = () => {
     isOpen = false;
@@ -13,7 +24,7 @@
 </script>
 
 <svelte:window
-  on:keydown={function (e) {
+  onkeydown={function (e) {
     if (e.key === "Escape") {
       onCloseClicked();
     }
@@ -34,18 +45,18 @@
         <button
           type="button"
           class="btn btn-sm btn-circle absolute right-[20px] top-[15px] cursor-pointer font-sans text-2xl text-[hsl(var(--twc-nodeTypesColorActive))]"
-          on:click={onCloseClicked}
+          onclick={onCloseClicked}
         >
           &times;
         </button>
       </div>
     {/if}
     <div class="modal-body">
-      <slot />
+      {@render children?.()}
     </div>
   </div>
 </div>
-<div class="background z-[1]" />
+<div class="background z-[1]"></div>
 
 <style>
   .modal {

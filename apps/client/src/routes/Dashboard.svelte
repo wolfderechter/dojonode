@@ -47,33 +47,33 @@
 
   // if custom localstorage API urls exist, use those, else use the default variables from the constants.ts file
   let CUSTOM_ETH_RPC_API_URL =
-    getLocalStorageItem("CUSTOM_ETH_RPC_API_URL") || ETH_RPC_API_URL;
+    $state(getLocalStorageItem("CUSTOM_ETH_RPC_API_URL") || ETH_RPC_API_URL);
   let CUSTOM_MYNODE_API_URL =
-    getLocalStorageItem("CUSTOM_MYNODE_API_URL") || MYNODE_API_URL;
+    $state(getLocalStorageItem("CUSTOM_MYNODE_API_URL") || MYNODE_API_URL);
   let CUSTOM_PROMETHEUS_API_URL =
-    getLocalStorageItem("CUSTOM_PROMETHEUS_API_URL") || PROMETHEUS_API_URL;
+    $state(getLocalStorageItem("CUSTOM_PROMETHEUS_API_URL") || PROMETHEUS_API_URL);
   let CUSTOM_DOJONODE_SERVER_API_URL =
-    getLocalStorageItem("CUSTOM_SYSTEMINFO_API_URL") || DOJONODE_SERVER_API_URL;
+    $state(getLocalStorageItem("CUSTOM_SYSTEMINFO_API_URL") || DOJONODE_SERVER_API_URL);
 
   // General metrics
-  let nodeHeight: number;
-  let chainHeight;
-  let gasPrice;
-  let syncingState;
-  let peers = null;
-  let syncingProgress = 0;
-  let customAddress = getLocalStorageItem("customAddress");
-  let nodeType = NodeTypes.Node;
+  let nodeHeight: number = $state();
+  let chainHeight = $state();
+  let gasPrice = $state();
+  let syncingState = $state();
+  let peers = $state(null);
+  let syncingProgress = $state(0);
+  let customAddress = $state(getLocalStorageItem("customAddress"));
+  let nodeType = $state(NodeTypes.Node);
 
   if (getLocalStorageItem("nodeType")) {
     nodeType = getLocalStorageItem("nodeType");
   }
 
   let intervalTimer: NodeJS.Timer;
-  let systeminformationMetrics: SysteminformationMetricsInterface = null;
+  let systeminformationMetrics: SysteminformationMetricsInterface = $state(null);
 
   // layout variables
-  let connectionsOpen: boolean = false;
+  let connectionsOpen: boolean = $state(false);
 
   // fetch general metrics from the node RPCs
   async function fetchGeneralMetrics() {
@@ -209,12 +209,12 @@
     <div class="nodeTypes flex justify-evenly mt-4">
       <button
         class:active={nodeType === NodeTypes.Node}
-        on:click={() => switchNodeType(NodeTypes.Node)}>node</button
+        onclick={() => switchNodeType(NodeTypes.Node)}>node</button
       >
       <span class="bar">|</span>
       <button
         class:active={nodeType === NodeTypes.Validator}
-        on:click={() => switchNodeType(NodeTypes.Validator)}>validator</button
+        onclick={() => switchNodeType(NodeTypes.Validator)}>validator</button
       >
     </div>
   </div>
@@ -236,7 +236,7 @@
     <button
       id="connectionsBtn"
       class="w-[30px] h-[30px] absolute right-[7px] mr-[6px] top-[-37px] cursor-pointer"
-      on:click={() => (connectionsOpen = true)}
+      onclick={() => (connectionsOpen = true)}
     >
       <img
         src={antennaIcon}
@@ -288,107 +288,109 @@
 
 {#if connectionsOpen}
   <DetailsModal title={"Connections"} bind:isOpen={connectionsOpen}>
-    <div
-      class="connections grid grid-cols-1 gap-6 mx-5 my-10 max-h-96 overflow-y-auto text-[hsl(var(--twc-textColor))]"
-      slot="body"
-    >
-      <div
-        class="flex sm:flex-row flex-col justify-between items-center font-bold"
+    {#snippet body()}
+        <div
+        class="connections grid grid-cols-1 gap-6 mx-5 my-10 max-h-96 overflow-y-auto text-[hsl(var(--twc-textColor))]"
+        
       >
-        address
-        <div class="ml-2 w-72 flex items-center">
-          <input
-            class="shadow appearance-none rounded w-full py-2 px-3 focus:outline-none focus:shadow-outline leading-none"
-            type="text"
-            bind:value={customAddress}
-            on:keyup={() => {
+        <div
+          class="flex sm:flex-row flex-col justify-between items-center font-bold"
+        >
+          address
+          <div class="ml-2 w-72 flex items-center">
+            <input
+              class="shadow appearance-none rounded w-full py-2 px-3 focus:outline-none focus:shadow-outline leading-none"
+              type="text"
+              bind:value={customAddress}
+              onkeyup={() => {
               setLocalStorageItem("customAddress", customAddress.trim());
             }}
-          />
+            />
+          </div>
         </div>
-      </div>
-      <div
-        class="flex sm:flex-row flex-col justify-between items-center font-bold"
-      >
-        node
-        <div class="ml-2 w-72 flex items-center">
-          <input
-            class="shadow appearance-none rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline mt-1"
-            type="text"
-            bind:value={CUSTOM_MYNODE_API_URL}
-            placeholder={MYNODE_API_URL}
-            on:change={() => {
+        <div
+          class="flex sm:flex-row flex-col justify-between items-center font-bold"
+        >
+          node
+          <div class="ml-2 w-72 flex items-center">
+            <input
+              class="shadow appearance-none rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline mt-1"
+              type="text"
+              bind:value={CUSTOM_MYNODE_API_URL}
+              placeholder={MYNODE_API_URL}
+              onchange={() => {
               setLocalStorageItem(
                 "CUSTOM_MYNODE_API_URL",
                 CUSTOM_MYNODE_API_URL,
               );
             }}
-          />
-          <img src={checkmarkIcon} alt="icon" class="w-[30px] ml-2" />
+            />
+            <img src={checkmarkIcon} alt="icon" class="w-[30px] ml-2" />
+          </div>
         </div>
-      </div>
-      <div
-        class="flex sm:flex-row flex-col justify-between items-center font-bold"
-      >
-        dojonode-server
-        <div class="ml-2 w-72 flex items-center">
-          <input
-            class="shadow appearance-none rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
-            type="text"
-            bind:value={CUSTOM_DOJONODE_SERVER_API_URL}
-            placeholder={DOJONODE_SERVER_API_URL}
-            on:change={() => {
+        <div
+          class="flex sm:flex-row flex-col justify-between items-center font-bold"
+        >
+          dojonode-server
+          <div class="ml-2 w-72 flex items-center">
+            <input
+              class="shadow appearance-none rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+              type="text"
+              bind:value={CUSTOM_DOJONODE_SERVER_API_URL}
+              placeholder={DOJONODE_SERVER_API_URL}
+              onchange={() => {
               setLocalStorageItem(
                 "CUSTOM_SYSTEMINFO_API_URL",
                 CUSTOM_DOJONODE_SERVER_API_URL,
               );
             }}
-          />
-          <img src={checkmarkIcon} alt="icon" class="w-[30px] ml-2" />
+            />
+            <img src={checkmarkIcon} alt="icon" class="w-[30px] ml-2" />
+          </div>
         </div>
-      </div>
-      <div
-        class="flex sm:flex-row flex-col justify-between items-center font-bold"
-      >
-        prometheus
-        <div class="ml-2 w-72 flex items-center">
-          <input
-            class="shadow appearance-none rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
-            type="text"
-            bind:value={CUSTOM_PROMETHEUS_API_URL}
-            placeholder={PROMETHEUS_API_URL}
-            on:change={() => {
+        <div
+          class="flex sm:flex-row flex-col justify-between items-center font-bold"
+        >
+          prometheus
+          <div class="ml-2 w-72 flex items-center">
+            <input
+              class="shadow appearance-none rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+              type="text"
+              bind:value={CUSTOM_PROMETHEUS_API_URL}
+              placeholder={PROMETHEUS_API_URL}
+              onchange={() => {
               setLocalStorageItem(
                 "CUSTOM_PROMETHEUS_API_URL",
                 CUSTOM_PROMETHEUS_API_URL,
               );
             }}
-          />
-          <!-- TODO: check if backend can reach prometheus? -->
-          <img src={checkmarkIcon} alt="icon" class="w-[30px] ml-2" />
+            />
+            <!-- TODO: check if backend can reach prometheus? -->
+            <img src={checkmarkIcon} alt="icon" class="w-[30px] ml-2" />
+          </div>
         </div>
-      </div>
-      <div
-        class="flex sm:flex-row flex-col justify-between items-center font-bold"
-      >
-        ethereum RPC
-        <div class="ml-2 w-72 flex items-center">
-          <input
-            class="shadow appearance-none rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline mb-1"
-            type="text"
-            bind:value={CUSTOM_ETH_RPC_API_URL}
-            placeholder={ETH_RPC_API_URL}
-            on:change={() => {
+        <div
+          class="flex sm:flex-row flex-col justify-between items-center font-bold"
+        >
+          ethereum RPC
+          <div class="ml-2 w-72 flex items-center">
+            <input
+              class="shadow appearance-none rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline mb-1"
+              type="text"
+              bind:value={CUSTOM_ETH_RPC_API_URL}
+              placeholder={ETH_RPC_API_URL}
+              onchange={() => {
               setLocalStorageItem(
                 "CUSTOM_ETH_RPC_API_URL",
                 CUSTOM_ETH_RPC_API_URL,
               );
             }}
-          />
-          <img src={checkmarkIcon} alt="icon" class="w-[30px] ml-2" />
+            />
+            <img src={checkmarkIcon} alt="icon" class="w-[30px] ml-2" />
+          </div>
         </div>
       </div>
-    </div>
+      {/snippet}
   </DetailsModal>
 {/if}
 

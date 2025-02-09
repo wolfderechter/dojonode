@@ -1,7 +1,11 @@
 <script lang="ts">
   import Progressbar from "./Progressbar.svelte";
-  export let progress: number;
-  export let syncingState;
+  interface Props {
+    progress: number;
+    syncingState: any;
+  }
+
+  let { progress, syncingState }: Props = $props();
 </script>
 
 <Progressbar {progress} showPercentage={true}>

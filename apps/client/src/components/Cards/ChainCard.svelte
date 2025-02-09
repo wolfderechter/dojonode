@@ -1,21 +1,29 @@
 <script lang="ts">
   import Card from "./Card.svelte";
 
-  export let icon: string;
-  export let body: string;
-  export let subBody: string;
+  interface Props {
+    icon: string;
+    body: string;
+    subBody: string;
+  }
+
+  let { icon, body, subBody }: Props = $props();
 </script>
 
 <Card title="chain" {icon}>
-  <div slot="body">
-    {#if body}
-      {body}
-    {/if}
-  </div>
+  {#snippet body()}
+    <div >
+      {#if body}
+        {body}
+      {/if}
+    </div>
+  {/snippet}
 
-  <div slot="subBody">
-    {#if subBody}
-      {subBody}
-    {/if}
-  </div>
+  {#snippet subBody()}
+    <div >
+      {#if subBody}
+        {subBody}
+      {/if}
+    </div>
+  {/snippet}
 </Card>

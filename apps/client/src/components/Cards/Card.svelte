@@ -1,10 +1,23 @@
 <script lang="ts">
   import Progressbar from "../Progressbar/Progressbar.svelte";
 
-  export let title: string = null;
-  export let icon: string = null;
-  export let loadingbar: boolean = null;
-  export let progress: number = null;
+  interface Props {
+    title?: string;
+    icon?: string;
+    loadingbar?: boolean;
+    progress?: number;
+    body?: import('svelte').Snippet;
+    subBody?: import('svelte').Snippet;
+  }
+
+  let {
+    title = null,
+    icon = null,
+    loadingbar = null,
+    progress = null,
+    body,
+    subBody
+  }: Props = $props();
 </script>
 
 <div class="card modal shadow-md">
@@ -18,9 +31,9 @@
       </div>
 
       <div class="bodyArea flex flex-col my-auto w-[90%]">
-        <slot name="body"></slot>
+        {@render body?.()}
         <span class="modal-sub-body">
-          <slot name="subBody"></slot>
+          {@render subBody?.()}
         </span>
       </div>
     </div>

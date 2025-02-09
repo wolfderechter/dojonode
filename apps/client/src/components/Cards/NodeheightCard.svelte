@@ -2,20 +2,28 @@
   import Card from "./Card.svelte";
   import chainIcon from "../../assets/icons/Chain.avif";
 
-  export let body: number;
-  export let subBody: number;
+  interface Props {
+    body: number;
+    subBody: number;
+  }
+
+  let { body, subBody }: Props = $props();
 </script>
 
 <Card title="nodeheight" icon={chainIcon}>
-  <div slot="body">
-    {#if body}
-      {body}
-    {/if}
-  </div>
+  {#snippet body()}
+    <div >
+      {#if body}
+        {body}
+      {/if}
+    </div>
+  {/snippet}
 
-  <div slot="subBody">
-    {#if subBody}
-      of {subBody}
-    {/if}
-  </div>
+  {#snippet subBody()}
+    <div >
+      {#if subBody}
+        of {subBody}
+      {/if}
+    </div>
+  {/snippet}
 </Card>

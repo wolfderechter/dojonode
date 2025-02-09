@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import CremeModeIcon from "../assets/icons/CremeMode.avif";
   import DarkModeIcon from "../assets/icons/DarkMode.avif";
   import { writable } from "svelte/store";
@@ -24,11 +24,11 @@
 
 <div class="flex flex-col justify-between items-center">
   {#if $currentTheme === Themes.Dark}
-    <button on:click={() => changeTheme(Themes.Paper)} class="theme">
+    <button onclick={() => changeTheme(Themes.Paper)} class="theme">
       <img src={CremeModeIcon} alt="creme/paper mode icon" />
     </button>
   {:else}
-    <button on:click={() => changeTheme(Themes.Dark)} class="theme">
+    <button onclick={() => changeTheme(Themes.Dark)} class="theme">
       <img src={DarkModeIcon} alt="dark mode icon" />
     </button>
   {/if}

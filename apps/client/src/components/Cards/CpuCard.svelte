@@ -2,16 +2,24 @@
   import Card from "./Card.svelte";
   import heartIcon from "../../assets/icons/Heart.avif";
 
-  export let body: number;
-  export let progress: number;
+  interface Props {
+    body: number;
+    progress: number;
+  }
+
+  let { body, progress }: Props = $props();
 </script>
 
 <Card title="cpu" icon={heartIcon} loadingbar={true} {progress}>
-  <div slot="body">
-    {#if body}
-      {body}
-    {/if}
-  </div>
+  {#snippet body()}
+    <div >
+      {#if body}
+        {body}
+      {/if}
+    </div>
+  {/snippet}
 
-  <div slot="subBody">%</div>
+  {#snippet subBody()}
+    <div >%</div>
+  {/snippet}
 </Card>

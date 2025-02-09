@@ -1,8 +1,19 @@
 <script lang="ts">
-  export let progress: number = null;
-  export let showPercentage: boolean = null;
-  export let widthPercentage: number = null;
-  export let heightPixels: number = null;
+  interface Props {
+    progress?: number;
+    showPercentage?: boolean;
+    widthPercentage?: number;
+    heightPixels?: number;
+    children?: import('svelte').Snippet<[any]>;
+  }
+
+  let {
+    progress = null,
+    showPercentage = null,
+    widthPercentage = null,
+    heightPixels = null,
+    children
+  }: Props = $props();
 </script>
 
 <div
@@ -12,13 +23,13 @@
   <div class="progress-bar__background">
     {#if showPercentage}
       <div class="progress-bar__text">
-        <slot {progress} >
+        {#if children}{@render children({ progress, })}{:else}
           {progress.toFixed(2)}%
-        </slot>
+        {/if}
       </div>
     {/if}
   </div>
-  <div class="progress-bar__fill" style={`width: ${progress}%`} />
+  <div class="progress-bar__fill" style={`width: ${progress}%`}></div>
 </div>
 
 <style>

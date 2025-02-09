@@ -2,15 +2,23 @@
   import Card from "./Card.svelte";
   import dollsIcon from "../../assets/icons/Dolls.avif";
 
-  export let body: number;
+  interface Props {
+    body: number;
+  }
+
+  let { body }: Props = $props();
 </script>
 
 <Card title="peers" icon={dollsIcon}>
-  <div slot="body">
-    {#if body}
-      {body}
-    {/if}
-  </div>
+  {#snippet body()}
+    <div >
+      {#if body}
+        {body}
+      {/if}
+    </div>
+  {/snippet}
 
-  <div slot="subBody">connected</div>
+  {#snippet subBody()}
+    <div >connected</div>
+  {/snippet}
 </Card>
