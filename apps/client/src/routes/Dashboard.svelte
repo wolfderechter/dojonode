@@ -6,22 +6,20 @@
     getLocalStorageItem,
   } from "../utils/localstorage";
   import DetailsModal from "../components/DetailsModal.svelte";
-  import Card from "../components/Card.svelte";
-  import ChainCard from "../components/ChainCard.svelte";
+  import Card from "../components/Cards/Card.svelte";
+  import MemoryCard from "../components/Cards/MemoryCard.svelte";
+  import CpuCard from "../components/Cards/CpuCard.svelte";
+  import PeersCard from "../components/Cards/PeersCard.svelte";
+  import GasCard from "../components/Cards/GasCard.svelte";
+  import RuntimeCard from "../components/Cards/RuntimeCard.svelte";
+  import StorageCard from "../components/Cards/StorageCard.svelte";
+  import NodeheightCard from "../components/Cards/NodeheightCard.svelte";
+  import ChainCard from "../components/Cards/ChainCard.svelte";
   import ThemeSwitcher from "../components/ThemeSwitcher.svelte";
   import SyncProgressbar from "../components/Progressbar/SyncProgressbar.svelte";
   import purseIcon from "../assets/icons/Purse.avif";
-  import heartIcon from "../assets/icons/Heart.avif";
-  import brainIcon from "../assets/icons/Brain.avif";
-  import dollsIcon from "../assets/icons/Dolls.avif";
   import checkmarkIcon from "../assets/icons/CheckMark.avif";
-  import fileboxIcon from "../assets/icons/FileBox.avif";
   import dojoScrollIcon from "../assets/icons/DojoScroll.svg";
-  import chainIcon from "../assets/icons/Chain.avif";
-  import packageIcon from "../assets/icons/Package.avif";
-  import abacusIcon from "../assets/icons/Abacus.avif";
-  import gasIcon from "../assets/icons/Gas.avif";
-  import timerclockIcon from "../assets/icons/Timer_Clock.avif";
   import warningIcon from "../assets/icons/Warning.avif";
   import antennaIcon from "../assets/icons/Antenna.avif";
   import ethIcon from "../assets/icons/Ethereum.avif";
@@ -248,68 +246,37 @@
     >
     <!-- TODO: make this dynamic, try to fetch the information from the node? -->
       <ChainCard
-        title="chain"
         body="ethereum"
         subBody="mainnet"
         icon={ethIcon}
       />
-      <Card
-        title="memory"
+      <MemoryCard
         body={systeminformationMetrics?.memUsedGB}
-        bodyMetricType={MetricTypes.gigabyte}
         subBody={systeminformationMetrics?.memUsedPerc}
-        subBodyMetricType={MetricTypes.percentage}
-        icon={brainIcon}
-        loadingbar={true}
         progress={systeminformationMetrics?.memUsedPerc}
       />
-      <Card
-        title="cpu"
+      <CpuCard
         body={systeminformationMetrics?.cpuUsedPerc}
-        bodyMetricType={MetricTypes.percentage}
-        icon={heartIcon}
-        loadingbar={true}
         progress={systeminformationMetrics?.cpuUsedPerc}
       />
-      <Card
-        title="storage"
+      <StorageCard
         body={systeminformationMetrics?.filestorageUsedGB}
-        bodyMetricType={MetricTypes.gigabyte}
         subBody={systeminformationMetrics?.filestorageUsedPerc}
-        subBodyMetricType={MetricTypes.percentage}
-        icon={fileboxIcon}
-        loadingbar={true}
         progress={systeminformationMetrics?.filestorageUsedPerc}
       />
-      <Card
-        title="nodeheight"
+      <NodeheightCard
         body={nodeHeight}
-        bodyMetricType={MetricTypes.blockheight}
         subBody={chainHeight}
-        subBodyMetricType={MetricTypes.blockheight}
-        icon={chainIcon}
-        loadingbar={false}
       />
-      <Card
-        title="peers"
+      <PeersCard
         body={peers}
-        bodyMetricType={MetricTypes.peers}
-        icon={dollsIcon}
-        loadingbar={false}
       />
-      <Card
-        title="runtime"
+      <RuntimeCard
         body={systeminformationMetrics?.runtime}
-        bodyMetricType={systeminformationMetrics?.runtimeMetricType}
-        icon={timerclockIcon}
-        loadingbar={false}
+        subBody={systeminformationMetrics?.runtimeMetricType}
       />
-      <Card
-        title="gas"
+      <GasCard
         body={gasPrice}
-        bodyMetricType={MetricTypes.gas}
-        icon={gasIcon}
-        loadingbar={false}
       />
       <!-- Invisible cards that push any incomplete rows of cards to the left -->
       <div class="invisible h-5">
@@ -334,7 +301,7 @@
       <div
         class="flex sm:flex-row flex-col justify-between items-center font-bold"
       >
-        ethereum address
+        address
         <div class="ml-2 w-72 flex items-center">
           <input
               class="shadow appearance-none rounded w-full py-2 px-3 focus:outline-none focus:shadow-outline leading-none"

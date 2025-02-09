@@ -1,8 +1,10 @@
 <script lang="ts">
+  import Progressbar from "../Progressbar/Progressbar.svelte";
+
   export let title: string = null;
-  export let body: string = null;
-  export let subBody: string = null;
   export let icon: string = null;
+  export let loadingbar: boolean = null;
+  export let progress: number = null;
 </script>
 
 <div class="card modal shadow-md">
@@ -15,8 +17,23 @@
         <img src={icon} alt="icon" />
       </div>
 
-      <div class="bodyArea flex flex-col my-auto w-[90%]">{body}</div>
-      <div class="modal-sub-body flex items-center justify-center">{subBody}</div>
+      <div class="bodyArea flex flex-col my-auto w-[90%]">
+        <slot name="body"></slot>
+        <span class="modal-sub-body">
+          <slot name="subBody"></slot>
+        </span>
+      </div>
+    </div>
+
+    <div class="width-[100%] text-center mt-auto mb-[12px]">
+      {#if loadingbar}
+        <Progressbar
+          {progress}
+          showPercentage={false}
+          widthPercentage={100}
+          heightPixels={10}
+        />
+      {/if}
     </div>
   </div>
 </div>
@@ -44,15 +61,13 @@
 
   .modal-sub-body {
     color: hsl(var(--twc-cardSubBodyColor));
-    font-size: 15px;
+    font-size: 14px;
   }
-
   .bodyArea {
     text-align: center;
     padding-top: 5px;
     color: hsl(var(--twc-textColor));
     font-weight: 400;
-    font-size: 18px;
   }
 
   @media (max-width: 750px) {
