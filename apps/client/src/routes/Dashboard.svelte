@@ -127,7 +127,7 @@
         ),
         filestorageUsedGB: Number((disk.used / 1024 / 1024 / 1024).toFixed(2)),
         filestorageUsedPerc: Number(disk.use.toFixed(2)),
-        runtime: Number(runtime.toFixed(0)),
+        runtime: Math.max(1, Math.round(runtime)),
         runtimeMetricType:
           runtimeInHours >= 1 ? MetricTypes.hours : MetricTypes.minutes,
       };
