@@ -136,30 +136,6 @@
     }
   }
 
-  // Fetch from prometheus
-  // const fetchPrometheus = async () => {
-  //   try {
-  //     const peersData = await queryPrometheus(
-  //       CUSTOM_PROMETHEUS_API_URL,
-  //       "p2p_peers",
-  //     );
-
-  //     // Check if we can find the p2p_peers value in the result, throw error if response is undefined
-  //     if (peersData?.data?.result?.[0]?.value?.[1] === undefined)
-  //       throw new Error("Value p2p_peers not found in the Prometheus response");
-
-  //     peers = peersData.data.result[0].value[1];
-  //     fetchPrometheusError = false;
-  //   } catch (error) {
-  //     peers = "";
-
-  //     if (!fetchPrometheusError) {
-  //       console.error("Error while fetching prometheus", error);
-  //       fetchPrometheusError = true;
-  //     }
-  //   }
-  // };
-
   // switching the nodetype reveals/hides certain cards
   function switchNodeType(type) {
     if (nodeType === type) return; // exit if nodeType is the same as the currently selected type
