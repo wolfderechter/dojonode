@@ -1,9 +1,10 @@
 <script lang="ts">
   import Card from "./Card.svelte";
   import gasIcon from "../../assets/icons/Gas.avif";
+  import { formatGwei } from "viem";
 
   interface Props {
-    body: number;
+    body: bigint;
   }
 
   let { body }: Props = $props();
@@ -13,7 +14,7 @@
   {#snippet cardBody()}
     <div >
       {#if body}
-        {body}
+        {Number(formatGwei(body)).toFixed(2)}
       {/if}
     </div>
   {/snippet}

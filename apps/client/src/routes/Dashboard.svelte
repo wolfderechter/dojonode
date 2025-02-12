@@ -58,7 +58,7 @@
   // General metrics
   let nodeHeight: number = $state();
   let chainHeight: number = $state();
-  let gasPrice: number = $state();
+  let gasPrice: bigint = $state();
   let syncingState = $state();
   let peers = $state(null);
   let syncingProgress = $state(0);
@@ -84,7 +84,7 @@
       if (generalMetricsResponse.ok) {
         const data = await generalMetricsResponse.json();
 
-        gasPrice = data.gasPrice;
+        gasPrice = BigInt(data.gasPrice);
         peers = data.peers;
         nodeHeight = data.nodeHeight;
         chainHeight = data.chainHeight;
