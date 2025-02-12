@@ -1,4 +1,4 @@
-import { createPublicClient, http } from "viem";
+import { createPublicClient, createWalletClient, http } from "viem";
 const express = require("express");
 const si = require("systeminformation");
 const cors = require("cors");
@@ -12,8 +12,11 @@ const ETH_RPC_API_URL = "https://ethereum-rpc.publicnode.com";
 // Start new timer on startup, to keep track of runtime
 const startTime = Date.now();
 
-const client = createPublicClient({
-  // chain: mainnet,
+const publicClient = createPublicClient({
+  transport: http(MYNODE_API_URL),
+});
+
+const walletClient = createWalletClient({
   transport: http(MYNODE_API_URL),
 });
 
@@ -48,22 +51,22 @@ app.get("/generalMetrics", async (req, res) => {
     chainId: null,
   };
 
-  const chainId = await client.request({
+  const chainId = await publicClient.request({
     method: "eth_chainId",
   });
   response.chainId = Number(chainId);
 
-  const peers = await client.request({
+  const peers = await publicClient.request({
     method: "net_peerCount",
   });
   response.peers = Number(peers);
 
-  const currentBlock = await client.getBlockNumber();
+  const currentBlock = await publicClient.getBlockNumber();
 
-  const gasPrice = await client.getGasPrice();
+  const gasPrice = await publicClient.getGasPrice();
   response.gasPrice = gasPrice?.toString();
 
-  const syncingStatus = await client.request({
+  const syncingStatus: NetworkSync | false = await walletClient.request({
     method: "eth_syncing",
   });
 
