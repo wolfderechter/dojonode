@@ -2,7 +2,7 @@
   "name": "@wolfderechter/dojonode-server",
   "version": "0.0.1",
   "description": "",
-  "main": "server.js",
+  "main": "server.ts",
   "keywords": [],
   "author": "wolfderechter",
   "license": "MIT",
