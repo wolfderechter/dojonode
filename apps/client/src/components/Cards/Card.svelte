@@ -6,8 +6,8 @@
     icon?: string;
     loadingbar?: boolean;
     progress?: number;
-    body?: import('svelte').Snippet;
-    subBody?: import('svelte').Snippet;
+    cardBody?: import('svelte').Snippet;
+    cardSubBody?: import('svelte').Snippet;
   }
 
   let {
@@ -15,8 +15,8 @@
     icon = null,
     loadingbar = null,
     progress = null,
-    body,
-    subBody
+    cardBody,
+    cardSubBody
   }: Props = $props();
 </script>
 
@@ -31,9 +31,9 @@
       </div>
 
       <div class="bodyArea flex flex-col my-auto w-[90%]">
-        {@render body?.()}
+        {@render cardBody?.()}
         <span class="modal-sub-body">
-          {@render subBody?.()}
+          {@render cardSubBody?.()}
         </span>
       </div>
     </div>

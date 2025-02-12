@@ -12,7 +12,7 @@
 </script>
 
 <Card title="memory" icon={brainIcon} loadingbar={true} {progress}>
-  {#snippet body()}
+  {#snippet cardBody()}
     <div >
       {#if body}
         {body} GB
@@ -20,7 +20,7 @@
     </div>
   {/snippet}
 
-  {#snippet subBody()}
+  {#snippet cardSubBody()}
     <div >
       {#if subBody}
         {subBody} %

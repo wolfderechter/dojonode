@@ -10,7 +10,7 @@
 </script>
 
 <Card title="gas" icon={gasIcon}>
-  {#snippet body()}
+  {#snippet cardBody()}
     <div >
       {#if body}
         {body}
@@ -18,7 +18,7 @@
     </div>
   {/snippet}
 
-  {#snippet subBody()}
+  {#snippet cardSubBody()}
     <div >
         gwei
     </div>

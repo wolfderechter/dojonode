@@ -10,7 +10,7 @@
 </script>
 
 <Card title="peers" icon={dollsIcon}>
-  {#snippet body()}
+  {#snippet cardBody()}
     <div >
       {#if body}
         {body}
@@ -18,7 +18,7 @@
     </div>
   {/snippet}
 
-  {#snippet subBody()}
+  {#snippet cardSubBody()}
     <div >connected</div>
   {/snippet}
 </Card>

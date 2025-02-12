@@ -11,7 +11,7 @@
 </script>
 
 <Card title="runtime" icon={timerclockIcon}>
-  {#snippet body()}
+  {#snippet cardBody()}
     <div >
       {#if body}
         {body}
@@ -19,7 +19,7 @@
     </div>
   {/snippet}
 
-  {#snippet subBody()}
+  {#snippet cardSubBody()}
     <div >
       {#if subBody}
         {subBody}

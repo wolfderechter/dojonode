@@ -11,7 +11,7 @@
 </script>
 
 <Card title="cpu" icon={heartIcon} loadingbar={true} {progress}>
-  {#snippet body()}
+  {#snippet cardBody()}
     <div >
       {#if body}
         {body}
@@ -19,7 +19,7 @@
     </div>
   {/snippet}
 
-  {#snippet subBody()}
+  {#snippet cardSubBody()}
     <div >%</div>
   {/snippet}
 </Card>
