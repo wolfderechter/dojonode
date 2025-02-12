@@ -86,8 +86,8 @@
 
         gasPrice = BigInt(data.gasPrice);
         peers = data.peers;
-        nodeHeight = data.nodeHeight;
-        chainHeight = data.chainHeight;
+        nodeHeight = Number(data.nodeHeight);
+        chainHeight = Number(data.chainHeight);
         syncingState = data.syncingState;
       }
     } catch (error) {

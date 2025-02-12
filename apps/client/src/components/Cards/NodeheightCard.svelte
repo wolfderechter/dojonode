@@ -14,7 +14,7 @@
   {#snippet cardBody()}
     <div >
       {#if body}
-        {body}
+        {body.toLocaleString("en")}
       {/if}
     </div>
   {/snippet}
@@ -22,7 +22,7 @@
   {#snippet cardSubBody()}
     <div >
       {#if subBody}
-        of {subBody}
+        of {subBody.toLocaleString("en")}
       {/if}
     </div>
   {/snippet}
