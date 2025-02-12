@@ -5,6 +5,23 @@ const cors = require("cors");
 const app = express();
 const port = 3009;
 
+interface GeneralMetricsResponse {
+  gasPrice: string | null;
+  peers: number | null;
+  nodeHeight: string | null;
+  chainHeight: string | null;
+  syncingState: SyncState;
+  chainId: number | null;
+}
+
+type SyncState = "synced" | "syncing" | "error" | null;
+
+interface NetworkSync {
+  currentBlock: string;
+  highestBlock: string;
+  startingBlock: string;
+}
+
 const MYNODE_API_URL = "http://100.95.151.102:8545";
 
 // Start new timer on startup, to keep track of runtime
@@ -39,8 +56,8 @@ app.get("/systemMetrics", async (_req, res) => {
   res.json(metrics);
 });
 
-app.get("/generalMetrics", async (req, res) => {
-  const response = {
+app.get("/generalMetrics", async (_req, res) => {
+  const response: GeneralMetricsResponse = {
     gasPrice: null,
     peers: null,
     nodeHeight: null,
