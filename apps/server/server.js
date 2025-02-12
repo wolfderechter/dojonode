@@ -5,9 +5,7 @@ const cors = require("cors");
 const app = express();
 const port = 3009;
 
-const PROMETHEUS_API_URL = "http://localhost:9090";
-const MYNODE_API_URL = "http://localhost:8545";
-const ETH_RPC_API_URL = "https://ethereum-rpc.publicnode.com";
+const MYNODE_API_URL = "http://100.95.151.102:8545";
 
 // Start new timer on startup, to keep track of runtime
 const startTime = Date.now();
