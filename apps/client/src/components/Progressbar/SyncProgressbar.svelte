@@ -9,7 +9,7 @@
 </script>
 
 <Progressbar {progress} showPercentage={true}>
-  {#if syncingState === "succes"}
+  {#if syncingState === "synced"}
     synced!
   {:else if syncingState === "syncing"}
     {progress.toFixed(2) + "%"}
