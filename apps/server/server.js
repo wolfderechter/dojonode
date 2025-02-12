@@ -1,3 +1,4 @@
+import { createPublicClient, http } from "viem";
 const express = require("express");
 const si = require("systeminformation");
 const cors = require("cors");
@@ -10,6 +11,11 @@ const ETH_RPC_API_URL = "https://ethereum-rpc.publicnode.com";
 
 // Start new timer on startup, to keep track of runtime
 const startTime = Date.now();
+
+const client = createPublicClient({
+  // chain: mainnet,
+  transport: http(MYNODE_API_URL),
+});
 
 app.use(
   cors({
@@ -32,37 +38,49 @@ app.get("/systemMetrics", async (_req, res) => {
   res.json(metrics);
 });
 
-// TODO: Send request to the node
 app.get("/generalMetrics", async (req, res) => {
-  const peersData = await queryPrometheus("p2p_peers");
-  const peers = peersData?.data?.result?.[0]?.value?.[1] ?? null;
+  const response = {
+    gasPrice: null,
+    peers: null,
+    nodeHeight: null,
+    chainHeight: null,
+    syncingState: null,
+    chainId: null,
+  };
 
-  res.json({
-    gasPrice: 5,
-    peers: peers,
-    nodeHeight: 1100,
-    chainHeight: 1200,
-    syncingState: "error", // TODO: use enum, union or whatever works best succes/syncing/error
+  const chainId = await client.request({
+    method: "eth_chainId",
   });
+  response.chainId = Number(chainId);
+
+  const peers = await client.request({
+    method: "net_peerCount",
+  });
+  response.peers = Number(peers);
+
+  const currentBlock = await client.getBlockNumber();
+
+  const gasPrice = await client.getGasPrice();
+  response.gasPrice = gasPrice?.toString();
+
+  const syncingStatus = await client.request({
+    method: "eth_syncing",
+  });
+
+  if (syncingStatus === false) {
+    response.syncingState = "synced";
+    response.nodeHeight = currentBlock.toString();
+    response.chainHeight = currentBlock.toString();
+  } else {
+    // Node is syncing...
+    response.syncingState = "syncing";
+    response.nodeHeight = Number(syncingStatus.currentBlock).toString();
+    response.chainHeight = Number(syncingStatus.highestBlock).toString();
+  }
+
+  res.json(response);
 });
 
 app.listen(port, () => {
   console.log(`dojonode API listening at http://localhost:${port}`);
 });
-
-async function queryPrometheus(query) {
-  try {
-    const response = await fetch(
-      PROMETHEUS_API_URL + `/api/v1/query?query=${query}`
-    );
-
-    if (!response.ok) {
-      console.error(`Prometheus API error: ${response.status}`);
-      return null;
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error(`Error querying Prometheus: ${error.message}`);
-  }
-}

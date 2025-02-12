@@ -9,6 +9,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.21.0",
-    "systeminformation": "^5.23.5"
+    "systeminformation": "^5.23.5",
+    "viem": "^2.23.2"
   }
 }
