@@ -7,7 +7,7 @@
   "author": "wolfderechter",
   "license": "MIT",
   "scripts": {
-    "start": "node server.ts"
+    "start": "bun server.ts"
   },
   "dependencies": {
     "cors": "^2.8.5",

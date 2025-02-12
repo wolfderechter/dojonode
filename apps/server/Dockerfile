@@ -1,5 +1,4 @@
-# Use the official Node.js image as the base image
-FROM node:23
+FROM oven/bun:latest
 
 # Set the working directory
 WORKDIR /app
@@ -8,8 +7,8 @@ WORKDIR /app
 COPY . .
 
 # Install dependencies
-RUN npm install
+RUN bun install
 EXPOSE 3009
 
 # Set the command to start the Node.js app
-CMD ["npm", "start"]
+CMD ["bun", "start"]
