@@ -29,9 +29,7 @@
     SysteminformationMetricsInterface,
   } from "../domain/types";
   import {
-    ETH_RPC_API_URL,
     MYNODE_API_URL,
-    PROMETHEUS_API_URL,
     DOJONODE_SERVER_API_URL,
   } from "../domain/constants";
 
@@ -46,12 +44,8 @@
   let estimatedSyncingTime: any;
 
   // if custom localstorage API urls exist, use those, else use the default variables from the constants.ts file
-  let CUSTOM_ETH_RPC_API_URL =
-    $state(getLocalStorageItem("CUSTOM_ETH_RPC_API_URL") || ETH_RPC_API_URL);
   let CUSTOM_MYNODE_API_URL =
     $state(getLocalStorageItem("CUSTOM_MYNODE_API_URL") || MYNODE_API_URL);
-  let CUSTOM_PROMETHEUS_API_URL =
-    $state(getLocalStorageItem("CUSTOM_PROMETHEUS_API_URL") || PROMETHEUS_API_URL);
   let CUSTOM_DOJONODE_SERVER_API_URL =
     $state(getLocalStorageItem("CUSTOM_SYSTEMINFO_API_URL") || DOJONODE_SERVER_API_URL);
 
@@ -316,49 +310,8 @@
               placeholder={DOJONODE_SERVER_API_URL}
               onchange={() => {
               setLocalStorageItem(
-                "CUSTOM_SYSTEMINFO_API_URL",
+                "CUSTOM_DOJONODE_SERVER_API_URL",
                 CUSTOM_DOJONODE_SERVER_API_URL,
-              );
-            }}
-            />
-            <img src={checkmarkIcon} alt="icon" class="w-[30px] ml-2" />
-          </div>
-        </div>
-        <div
-          class="flex sm:flex-row flex-col justify-between items-center font-bold"
-        >
-          prometheus
-          <div class="ml-2 w-72 flex items-center">
-            <input
-              class="shadow appearance-none rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
-              type="text"
-              bind:value={CUSTOM_PROMETHEUS_API_URL}
-              placeholder={PROMETHEUS_API_URL}
-              onchange={() => {
-              setLocalStorageItem(
-                "CUSTOM_PROMETHEUS_API_URL",
-                CUSTOM_PROMETHEUS_API_URL,
-              );
-            }}
-            />
-            <!-- TODO: check if backend can reach prometheus? -->
-            <img src={checkmarkIcon} alt="icon" class="w-[30px] ml-2" />
-          </div>
-        </div>
-        <div
-          class="flex sm:flex-row flex-col justify-between items-center font-bold"
-        >
-          ethereum RPC
-          <div class="ml-2 w-72 flex items-center">
-            <input
-              class="shadow appearance-none rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline mb-1"
-              type="text"
-              bind:value={CUSTOM_ETH_RPC_API_URL}
-              placeholder={ETH_RPC_API_URL}
-              onchange={() => {
-              setLocalStorageItem(
-                "CUSTOM_ETH_RPC_API_URL",
-                CUSTOM_ETH_RPC_API_URL,
               );
             }}
             />
