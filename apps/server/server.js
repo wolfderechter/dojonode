@@ -77,8 +77,8 @@ app.get("/generalMetrics", async (req, res) => {
   } else {
     // Node is syncing...
     response.syncingState = "syncing";
-    response.nodeHeight = Number(syncingStatus.currentBlock).toString();
-    response.chainHeight = Number(syncingStatus.highestBlock).toString();
+    response.chainHeight = Number(syncingStatus.currentBlock).toString();
+    response.nodeHeight = Number(syncingStatus.highestBlock).toString();
   }
 
   res.json(response);
