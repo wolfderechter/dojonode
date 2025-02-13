@@ -1,7 +1,8 @@
 import { createPublicClient, createWalletClient, http } from "viem";
-const express = require("express");
-const si = require("systeminformation");
-const cors = require("cors");
+import express from "express";
+import si from "systeminformation";
+import cors from "cors";
+
 const app = express();
 const port = 3009;
 
