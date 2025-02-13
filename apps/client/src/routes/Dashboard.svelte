@@ -22,7 +22,6 @@
   import dojoScrollIcon from "../assets/icons/DojoScroll.svg";
   import warningIcon from "../assets/icons/Warning.avif";
   import antennaIcon from "../assets/icons/Antenna.avif";
-  import ethIcon from "../assets/icons/Ethereum.avif";
   import { MetricTypes, NodeTypes } from "../domain/enums";
   import type {
     Systeminfo,
@@ -50,6 +49,7 @@
     $state(getLocalStorageItem("CUSTOM_SYSTEMINFO_API_URL") || DOJONODE_SERVER_API_URL);
 
   // General metrics
+  let chainId: number = $state();
   let nodeHeight: number = $state();
   let chainHeight: number = $state();
   let gasPrice: bigint = $state();
@@ -83,6 +83,7 @@
         nodeHeight = Number(data.nodeHeight);
         chainHeight = Number(data.chainHeight);
         syncingState = data.syncingState;
+        chainId = data.chainId;
       }
     } catch (error) {
       console.error("Error fetching general metrics:", error);
@@ -220,7 +221,7 @@
       class="mt-[1px] flex flex-wrap justify-center overflow-y-clip"
     >
       <!-- TODO: make this dynamic, try to fetch the information from the node? -->
-      <ChainCard body="ethereum" subBody="mainnet" icon={ethIcon} />
+      <ChainCard {chainId} />
       <MemoryCard
         body={systeminformationMetrics?.memUsedGB}
         subBody={systeminformationMetrics?.memUsedPerc}
