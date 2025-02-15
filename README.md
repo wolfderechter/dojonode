@@ -13,7 +13,7 @@ WIP but the goal is to have an easy dashboard option for ethereum/gnosis nodes.
 - All API requests to the node are now made in the backend
     - No browser limitations
 - Use Viem instead of web3.js since it's getting deprecated
-- Bump to latest versions: Svelte 5, Vite 6
+- Bump to latest versions: Svelte 5, Vite 6, Tailwind v4
 - Compatible with any node
     - Ethereum, Gnosis
     - Layer 2 nodes (Taiko, ...)
