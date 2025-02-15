@@ -8,27 +8,10 @@ import express from "express";
 import si from "systeminformation";
 import cors from "cors";
 import { getChainInfo } from "./utils/chain";
+import { GeneralMetricsResponse, NetworkSync } from './utils/types';
 
 const app = express();
 const port = 3009;
-
-interface GeneralMetricsResponse {
-  gasPrice: string | null;
-  peers: number | null;
-  nodeHeight: string | null;
-  chainHeight: string | null;
-  syncingState: SyncState;
-  chainId: number | null;
-  estimatedSyncingTimeInSeconds: number | null;
-}
-
-type SyncState = "synced" | "syncing" | "error" | null;
-
-interface NetworkSync {
-  currentBlock: string;
-  highestBlock: string;
-  startingBlock: string;
-}
 
 const MYNODE_API_URL = "http://100.95.151.102:8545";
 
