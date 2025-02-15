@@ -1,49 +1,31 @@
 <script lang="ts">
   import Card from "./Card.svelte";
-  import ethIcon from "../../assets/icons/Ethereum.avif";
-  import taikoIcon from "../../assets/taikoLogoIcon.png";
+  import { getChainInfo } from "../../../../../shared/chain";
+  import ethIcon from "../../assets/chains/Ethereum.avif";
+  import gnosisIcon from "../../assets/chains/Gnosis.avif";
+  import taikoIcon from "../../assets/chains/Taiko.avif";
 
   interface Props {
-    chainId: number;
+    chainId?: number;
   }
 
   let { chainId }: Props = $props();
 
-  function getChainData(chainId: number) {
-    switch(chainId) {
-      case 0: // Ethereum
-        return {
-          network: "ethereum",
-          icon: ethIcon
-        };
-      case 100: // Gnosis
-        return {
-          network: "gnosis",
-          icon: ethIcon
-        };
-      case 167000: // Taiko
-        return {
-          network: "taiko",
-          icon: taikoIcon
-        };
-      default:
-        return {
-          network: undefined,
-          icon: undefined
-        };
-    }
-  }
+  const ICONS = {
+    1: ethIcon,
+    100: gnosisIcon,
+    167000: taikoIcon,
+  };
 
-  const chainData = $derived(getChainData(chainId));
-  const network = $derived(chainData.network);
-  const icon = $derived(chainData.icon);
+  const chain = $derived(chainId ? getChainInfo(chainId).name : null);
+  const icon = $derived(chainId ? ICONS[chainId] : null);
 </script>
 
-<Card title="chain" icon={icon ?? null}>
+<Card title="chain" {icon}>
   {#snippet cardBody()}
     <div>
-      {#if network}
-        {network}
+      {#if chain}
+        {chain}
       {/if}
     </div>
   {/snippet}

@@ -27,7 +27,9 @@
       class="flex content-between items-center h-[100px] justify-around flex-col"
     >
       <div class="w-[45px]">
-        <img src={icon} alt="icon" />
+          {#if icon}
+              <img src={icon} alt="icon" />
+          {/if}
       </div>
 
       <div class="bodyArea flex flex-col my-auto w-[90%]">
