@@ -7,7 +7,7 @@ import {
 import express from "express";
 import si from "systeminformation";
 import cors from "cors";
-import { getChainInfo } from "@shared/chain";
+import { getChainInfo } from "./utils/chain";
 
 const app = express();
 const port = 3009;

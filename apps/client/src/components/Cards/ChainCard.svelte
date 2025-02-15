@@ -1,6 +1,6 @@
 <script lang="ts">
   import Card from "./Card.svelte";
-  import { getChainInfo } from "@shared/chain";
+  import { getChainInfo } from "../../utils/chain";
   import ethIcon from "../../assets/chains/Ethereum.avif";
   import gnosisIcon from "../../assets/chains/Gnosis.avif";
   import taikoIcon from "../../assets/chains/Taiko.avif";

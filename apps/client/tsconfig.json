@@ -15,10 +15,7 @@
      */
     "allowJs": true,
     "checkJs": true,
-    "isolatedModules": false,
-    "paths": {
-      "@shared/*": ["../../shared/*"]
-    }
+    "isolatedModules": false
   },
   "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte"]
 }

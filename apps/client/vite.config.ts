@@ -15,11 +15,6 @@ export default defineConfig({
     host: "0.0.0.0",
     port: 5173,
   },
-  resolve: {
-    alias: {
-      "@shared": path.resolve(__dirname, "../../shared"),
-    },
-  },
   plugins: [
     svelte({
       preprocess: [sveltePreprocess({ typescript: true })],
