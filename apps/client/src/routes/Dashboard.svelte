@@ -54,10 +54,11 @@
   let chainHeight: number = $state();
   let gasPrice: bigint = $state();
   let syncingState = $state();
-  let peers = $state(null);
-  let syncingProgress = $state(0);
+  let peers: number = $state(null);
+  let syncingProgressPercentage = $state(0);
   let customAddress = $state(getLocalStorageItem("customAddress"));
   let nodeType = $state(NodeTypes.Node);
+  let estimatedSyncingTime: string = $state();
 
   if (getLocalStorageItem("nodeType")) {
     nodeType = getLocalStorageItem("nodeType");
@@ -78,17 +79,19 @@
       if (generalMetricsResponse.ok) {
         const data = await generalMetricsResponse.json();
 
+        chainId = data.chainId;
         gasPrice = BigInt(data.gasPrice);
         peers = data.peers;
         nodeHeight = Number(data.nodeHeight);
         chainHeight = Number(data.chainHeight);
         syncingState = data.syncingState;
-        chainId = data.chainId;
+        if(syncingState === "syncing")
+          estimatedSyncingTime = simpleDuration.stringify(data.estimatedSyncingTimeInSeconds, "m");
       }
     } catch (error) {
       console.error("Error fetching general metrics:", error);
     }
-    syncingProgress = (nodeHeight / chainHeight) * 100;
+    syncingProgressPercentage = (nodeHeight / chainHeight) * 100;
   }
 
   // fetch from the nodejs api that exposes system metrics using the npm package systeminformation
@@ -192,7 +195,7 @@
 
   <!-- Progress Bar -->
   <div class="my-4 text-center">
-    <SyncProgressbar {syncingState} progress={syncingProgress} />
+    <SyncProgressbar {syncingState} progress={syncingProgressPercentage} />
     {#if estimatedSyncingTime && syncingState === "syncing"}
       <span class="text-[12px] text-[hsl(var(--twc-cardSubBodyColor))]"
         >{estimatedSyncingTime}</span

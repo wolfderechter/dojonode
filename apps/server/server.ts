@@ -13,6 +13,7 @@ interface GeneralMetricsResponse {
   chainHeight: string | null;
   syncingState: SyncState;
   chainId: number | null;
+  estimatedSyncingTimeInSeconds: number | null;
 }
 
 type SyncState = "synced" | "syncing" | "error" | null;
@@ -28,8 +29,13 @@ const MYNODE_API_URL = "http://100.95.151.102:8545";
 // Start new timer on startup, to keep track of runtime
 const startTime = Date.now();
 
-const publicClient = createPublicClient({
+// Client is connected to the node
+const client = createPublicClient({
   transport: http(MYNODE_API_URL),
+});
+// publicClient is connected to a public RPC
+const publicClient = createPublicClient({
+  transport: http("https://gnosis-rpc.publicnode.com"),
 });
 
 const walletClient = createWalletClient({
@@ -65,21 +71,22 @@ app.get("/generalMetrics", async (_req, res) => {
     chainHeight: null,
     syncingState: null,
     chainId: null,
+    estimatedSyncingTimeInSeconds: null,
   };
 
-  const chainId = await publicClient.request({
+  const chainId = await client.request({
     method: "eth_chainId",
   });
   response.chainId = Number(chainId);
 
-  const peers = await publicClient.request({
+  const peers = await client.request({
     method: "net_peerCount",
   });
   response.peers = Number(peers);
 
-  const currentBlock = await publicClient.getBlockNumber();
+  const currentBlock = await client.getBlockNumber();
 
-  const gasPrice = await publicClient.getGasPrice();
+  const gasPrice = await client.getGasPrice();
   response.gasPrice = gasPrice?.toString();
 
   const syncingStatus: NetworkSync | false = await walletClient.request({
@@ -93,8 +100,21 @@ app.get("/generalMetrics", async (_req, res) => {
   } else {
     // Node is syncing...
     response.syncingState = "syncing";
-    response.chainHeight = Number(syncingStatus.currentBlock).toString();
+    // While the node is syncing, the chainheight from the node is not reliable, and we have to use public RPC as a fallback
+    response.chainHeight = Number(
+      await publicClient.getBlockNumber()
+    ).toString();
     response.nodeHeight = Number(syncingStatus.highestBlock).toString();
+
+    // Estimate syncing time
+    const blocksDownloaded =
+      Number(syncingStatus.currentBlock) - Number(syncingStatus.startingBlock);
+    const blocksRemaining =
+      Number(syncingStatus.currentBlock) - Number(syncingStatus.highestBlock);
+    const downloadProgress = blocksDownloaded / blocksRemaining;
+    const timeElapsed = Date.now() - startTime;
+    response.estimatedSyncingTimeInSeconds =
+      timeElapsed / downloadProgress / 1000;
   }
 
   res.json(response);
