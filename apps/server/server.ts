@@ -1,7 +1,13 @@
-import { createPublicClient, createWalletClient, http } from "viem";
+import {
+  createPublicClient,
+  createWalletClient,
+  http,
+  PublicClient,
+} from "viem";
 import express from "express";
 import si from "systeminformation";
 import cors from "cors";
+import { getChainInfo } from "../../shared/chain";
 
 const app = express();
 const port = 3009;
@@ -34,9 +40,7 @@ const client = createPublicClient({
   transport: http(MYNODE_API_URL),
 });
 // publicClient is connected to a public RPC
-const publicClient = createPublicClient({
-  transport: http("https://gnosis-rpc.publicnode.com"),
-});
+let publicClient: PublicClient;
 
 const walletClient = createWalletClient({
   transport: http(MYNODE_API_URL),
@@ -100,11 +104,16 @@ app.get("/generalMetrics", async (_req, res) => {
   } else {
     // Node is syncing...
     response.syncingState = "syncing";
+    response.nodeHeight = Number(syncingStatus.highestBlock).toString();
+
     // While the node is syncing, the chainheight from the node is not reliable, and we have to use public RPC as a fallback
+    const publicClientApi = getChainInfo(response.chainId).rpc;
+    publicClient = createPublicClient({
+      transport: http(publicClientApi),
+    });
     response.chainHeight = Number(
       await publicClient.getBlockNumber()
     ).toString();
-    response.nodeHeight = Number(syncingStatus.highestBlock).toString();
 
     // Estimate syncing time
     const blocksDownloaded =

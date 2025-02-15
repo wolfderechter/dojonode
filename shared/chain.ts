@@ -14,5 +14,5 @@ export const CHAINS = {
 };
 
 export function getChainInfo(chainId: number) {
-  return CHAINS[chainId] || { name: null, icon: null, rpc: null };
+  return CHAINS[chainId] || { name: null, rpc: null };
 }
