@@ -78,8 +78,9 @@
         nodeHeight = Number(data.nodeHeight);
         chainHeight = Number(data.chainHeight);
         syncingState = data.syncingState;
-        if(syncingState === "syncing")
+        if(syncingState === "syncing" && data.estimatedSyncingTimeInSeconds) {
           estimatedSyncingTime = simpleDuration.stringify(data.estimatedSyncingTimeInSeconds, "m");
+        }
       }
     } catch (error) {
       console.error("Error fetching general metrics:", error);
