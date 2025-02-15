@@ -146,6 +146,10 @@
   }
 
   onMount(async () => {
+    // Fire these fetches immediately
+    fetchGeneralMetrics();
+    fetchSystemMetrics();
+
     // Interval to fetch metrics every 30 seconds
     intervalTimer = setInterval(async () => {
       try {
