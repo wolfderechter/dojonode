@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import { VitePWA } from "vite-plugin-pwa";
 import { sveltePreprocess } from "svelte-preprocess";
+import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -13,6 +14,11 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     port: 5173,
+  },
+  resolve: {
+    alias: {
+      "@shared": path.resolve(__dirname, "../../shared"),
+    },
   },
   plugins: [
     svelte({
