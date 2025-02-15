@@ -1,8 +1,10 @@
 <script lang="ts">
+  import type { SyncState } from "src/domain/types";
   import Progressbar from "./Progressbar.svelte";
+
   interface Props {
     progress: number;
-    syncingState: any;
+    syncingState: SyncState;
   }
 
   let { progress, syncingState }: Props = $props();

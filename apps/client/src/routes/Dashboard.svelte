@@ -24,6 +24,7 @@
   import antennaIcon from "../assets/icons/Antenna.avif";
   import { MetricTypes, NodeTypes } from "../domain/enums";
   import type {
+    SyncState,
     Systeminfo,
     SysteminformationMetricsInterface,
   } from "../domain/types";
@@ -46,7 +47,7 @@
   let nodeHeight: number = $state();
   let chainHeight: number = $state();
   let gasPrice: bigint = $state();
-  let syncingState = $state();
+  let syncingState: SyncState = $state();
   let peers: number = $state(null);
   let syncingProgressPercentage = $state(0);
   let customAddress = $state(getLocalStorageItem("customAddress"));

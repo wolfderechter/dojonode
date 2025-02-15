@@ -65,3 +65,5 @@ export interface Systeminfo {
   }[];
   startTime: number;
 }
+
+export type SyncState = "synced" | "syncing" | "error" | null;
