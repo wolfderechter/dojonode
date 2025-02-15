@@ -13,7 +13,7 @@
 <Card title="nodeheight" icon={chainIcon}>
   {#snippet cardBody()}
     <div >
-      {#if body}
+      {#if body !== null && body !== undefined}
         {body.toLocaleString("en")}
       {/if}
     </div>
@@ -21,7 +21,7 @@
 
   {#snippet cardSubBody()}
     <div >
-      {#if subBody}
+      {#if subBody !== null && subBody !== undefined}
         of {subBody.toLocaleString("en")}
       {/if}
     </div>

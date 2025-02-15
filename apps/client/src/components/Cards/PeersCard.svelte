@@ -12,7 +12,7 @@
 <Card title="peers" icon={dollsIcon}>
   {#snippet cardBody()}
     <div >
-      {#if body}
+      {#if body !== null || body !== undefined}
         {body}
       {/if}
     </div>
