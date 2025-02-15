@@ -31,12 +31,12 @@
   }}
 />
 <div
-  class="modal bg-[hsl(var(--twc-cardBackgroundColor))] absolute top-[50%] left-[50%] z-50 translate-x-[-50%] translate-y-[-50%] rounded-[20px] md:w-[650px] w-[350px] shadow-2xl"
+  class="modal bg-[var(--cardBackgroundColor)] absolute top-[50%] left-[50%] z-50 translate-x-[-50%] translate-y-[-50%] rounded-[20px] md:w-[650px] w-[350px] shadow-2xl"
   class:modal-open={isOpen}
 >
   <div class="modal-box bg-dark-2">
     <h3
-      class="font-bold text-lg text-center mt-4 text-[hsl(var(--twc-nodeTypesColorActive))]"
+      class="font-bold text-lg text-center mt-4 text-[var(--nodeTypesColorActive)]"
     >
       {title}
     </h3>
@@ -44,7 +44,7 @@
       <div class="modal-action mt-0">
         <button
           type="button"
-          class="btn btn-sm btn-circle absolute right-[20px] top-[15px] cursor-pointer font-sans text-2xl text-[hsl(var(--twc-nodeTypesColorActive))]"
+          class="btn btn-sm btn-circle absolute right-[20px] top-[15px] cursor-pointer font-sans text-2xl text-[var(--nodeTypesColorActive)]"
           onclick={onCloseClicked}
         >
           &times;

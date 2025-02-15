@@ -195,7 +195,7 @@
   <div class="my-4 text-center">
     <SyncProgressbar {syncingState} progress={syncingProgressPercentage} />
     {#if estimatedSyncingTime && syncingState === "syncing"}
-      <span class="text-[12px] text-[hsl(var(--twc-cardSubBodyColor))]"
+      <span class="text-[12px] text-[var(--cardSubBodyColor)]"
         >{estimatedSyncingTime}</span
       >
     {/if}
@@ -262,7 +262,7 @@
   <DetailsModal title={"Connections"} bind:isOpen={connectionsOpen}>
     {#snippet body()}
         <div
-        class="connections grid grid-cols-1 gap-6 mx-5 my-10 max-h-96 overflow-y-auto text-[hsl(var(--twc-textColor))]"
+        class="connections grid grid-cols-1 gap-6 mx-5 my-10 max-h-96 overflow-y-auto text-[var(--textColor)]"
 
       >
         <div
@@ -327,7 +327,7 @@
 
 <style>
   .nodeTypes {
-    color: hsl(var(--twc-textColor));
+    color: var(--textColor);
     font-weight: 400;
     z-index: 1;
     position: relative;
@@ -337,19 +337,19 @@
   }
 
   .nodeTypes .active {
-    color: hsl(var(--twc-nodeTypesColorActive));
+    color: var(--nodeTypesColorActive);
     font-weight: 600;
   }
 
   .nodeTypes .bar {
     margin-top: auto;
     margin-bottom: auto;
-    color: hsl(var(--twc-textColor));
+    color: var(--textColor);
     font-weight: 400;
   }
 
   .connections input {
-    background-color: hsl(var(--twc-inputAccentColor));
+    background-color: var(--inputAccentColor);
   }
 
   .animateConnections {
@@ -399,7 +399,7 @@
   }
 
   section {
-    color: hsl(var(--twc-textColor));
+    color: var(--textColor);
     display: flex;
     flex-direction: column;
     justify-content: center;

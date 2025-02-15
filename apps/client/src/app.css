@@ -1,27 +1,63 @@
- /* Responsiveness */
- .nodeTypes button.active {
-     transition: 0.4s;
-     -webkit-transform: scale(1.02);
-     -moz-transform: scale(1.02);
-     -ms-transform: scale(1.02);
-     -o-transform: scale(1.02);
-     transform: scale(1.02);
- }
+@import "tailwindcss";
 
- button.active {
-     transition: 0.4s;
-     -webkit-transform: scale(0.98);
-     -moz-transform: scale(0.98);
-     -ms-transform: scale(0.98);
-     -o-transform: scale(0.98);
-     transform: scale(0.98);
- }
+[data-theme="paper"] {
+  --secondaryColor: oklch(86.92% 0.0608 4.27);
+  --tertiaryColor: oklch(59.99% 0 0);
+  --backgroundColor: oklch(98.3% 0.0195 87.51);
+  --textColor: oklch(38.67% 0 0);
+  --nodeTypesColorActive: oklch(60.2% 0.2152 29.48);
+  --progressBarFillColor: oklch(80.78% 0.0884 29.52);
+  --progressBarBackgroundColor: oklch(92.41% 0.0102 238.52);
+  --cardBackgroundColor: oklch(96.72% 0 0);
+  --cardTitleColor: oklch(60.2% 0.2152 29.48);
+  --cardSubBodyColor: oklch(68.35% 0.0104 299.15);
+  --inputAccentColor: oklch(92.41% 0.0102 238.52);
+  --themeSwitcherColor: oklch(80.78% 0.0884 29.52);
+}
 
- input:focus {
-     transition: 0.4s;
-     -webkit-transform: scale(0.98);
-     -moz-transform: scale(0.98);
-     -ms-transform: scale(0.98);
-     -o-transform: scale(0.98);
-     transform: scale(0.98);
- }
+[data-theme="dark"] {
+  --secondaryColor: oklch(86.92% 0.0608 4.27);
+  --tertiaryColor: oklch(85.14% 0 0);
+  --backgroundColor: oklch(22.1% 0.0015 197.05);
+  --textColor: oklch(96.72% 0 0);
+  --nodeTypesColorActive: oklch(60.2% 0.2152 29.48);
+  --progressBarFillColor: oklch(60.2% 0.2152 29.48);
+  --progressBarBackgroundColor: oklch(57.65% 0.0196 158.75);
+  --cardBackgroundColor: oklch(38.67% 0 0);
+  --cardTitleColor: oklch(60.2% 0.2152 29.48);
+  --cardSubBodyColor: oklch(80.37% 0.0089 128.58);
+  --inputAccentColor: oklch(57.65% 0.0196 158.75);
+  --themeSwitcherColor: oklch(60.2% 0.2152 29.48);
+}
+
+/* Responsiveness */
+.nodeTypes button.active {
+  transition: 0.4s;
+  -webkit-transform: scale(1.02);
+  -moz-transform: scale(1.02);
+  -ms-transform: scale(1.02);
+  -o-transform: scale(1.02);
+  transform: scale(1.02);
+}
+
+.nodeTypes button {
+  cursor: pointer;
+}
+
+button.active {
+  transition: 0.4s;
+  -webkit-transform: scale(0.98);
+  -moz-transform: scale(0.98);
+  -ms-transform: scale(0.98);
+  -o-transform: scale(0.98);
+  transform: scale(0.98);
+}
+
+input:focus {
+  transition: 0.4s;
+  -webkit-transform: scale(0.98);
+  -moz-transform: scale(0.98);
+  -ms-transform: scale(0.98);
+  -o-transform: scale(0.98);
+  transform: scale(0.98);
+}

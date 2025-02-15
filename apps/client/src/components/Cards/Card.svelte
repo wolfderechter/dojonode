@@ -58,9 +58,9 @@
     align-items: center;
     padding: 10px 20px;
     margin: 6px;
-    border: 1px solid hsl(var(--twc-cardBackgroundColor));
+    border: 1px solid var(--cardBackgroundColor);
     border-radius: 20px;
-    background-color: hsl(var(--twc-cardBackgroundColor));
+    background-color: var(--cardBackgroundColor);
     aspect-ratio: 1/1;
     height: 170px;
   }
@@ -68,20 +68,20 @@
   .modal-title {
     margin-bottom: 10px;
     text-align: center;
-    color: hsl(var(--twc-cardTitleColor));
+    color: var(--cardTitleColor);
     font-size: 18px;
     font-size: large;
     font-weight: 600;
   }
 
   .modal-sub-body {
-    color: hsl(var(--twc-cardSubBodyColor));
+    color: var(--cardSubBodyColor);
     font-size: 14px;
   }
   .bodyArea {
     text-align: center;
     padding-top: 5px;
-    color: hsl(var(--twc-textColor));
+    color: var(--textColor);
     font-weight: 400;
   }
 

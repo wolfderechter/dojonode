@@ -19,12 +19,8 @@
 </main>
 
 <style global lang="postcss">
-  @tailwind base;
-  @tailwind components;
-  @tailwind utilities;
-
   body {
     font-family: "Jost", sans-serif;
-    background-color: hsl(var(--twc-backgroundColor));
+    background-color: var(--backgroundColor);
   }
 </style>
