@@ -34,13 +34,6 @@
 
   // TODO: add error handling back in
   let hasError = false;
-  // Syncing estimation
-  // TODO: define types instead of any
-  let startNodeHeight: any;
-  let startTime = Date.now();
-  let currentNodeheight;
-  let currentTime: any;
-  let estimatedSyncingTime: any;
 
   // if custom localstorage API urls exist, use those, else use the default variables from the constants.ts file
   let CUSTOM_MYNODE_API_URL =
