@@ -40,7 +40,6 @@
     "simple-duration": "^1.1.1",
     "svelte-spa-router": "^4.0.1",
     "viem": "^2.23.2",
-    "vite-plugin-pwa": "^0.21.1",
-    "web3": "^4.16.0"
+    "vite-plugin-pwa": "^0.21.1"
   }
 }
