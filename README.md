@@ -9,14 +9,14 @@ WIP but the goal is to have an easy dashboard option for ethereum/gnosis nodes.
 - Major refactoring
 - Moved to use a monorepo setup
 - Removed prometheus dependency (directly fetch amount of peers from the node)
-    - Reduces the setup required
+  - Reduces the setup required
 - All API requests to the node are now made in the backend
-    - No browser limitations
+  - No browser limitations
 - Use Viem instead of web3.js since it's getting deprecated
 - Bump to latest versions: Svelte 5, Vite 6, Tailwind v4
 - Compatible with any node
-    - Ethereum, Gnosis
-    - Layer 2 nodes (Taiko, ...)
+  - Ethereum, Gnosis
+  - Layer 2 nodes (Taiko, ...)
 
 ## Setup
 
@@ -83,7 +83,7 @@ services:
       --authrpc.addr=0.0.0.0
       --authrpc.vhosts=*
       --prune.mode=minimal
-      --torrent.download.rate=1mb
+      --torrent.download.rate=150mb
       --torrent.upload.rate=50mb
       --authrpc.jwtsecret=/jwt
 
@@ -106,6 +106,4 @@ services:
       - "3009:3009"
     networks:
       - node_network
-
-
 ```
