@@ -40,7 +40,7 @@
   let CUSTOM_MYNODE_API_URL =
     $state(getLocalStorageItem("CUSTOM_MYNODE_API_URL") || MYNODE_API_URL);
   let CUSTOM_DOJONODE_SERVER_API_URL =
-    $state(getLocalStorageItem("CUSTOM_SYSTEMINFO_API_URL") || DOJONODE_SERVER_API_URL);
+    $state(getLocalStorageItem("CUSTOM_DOJONODE_SERVER_API_URL") || DOJONODE_SERVER_API_URL);
 
   // General metrics
   let chainId: number = $state();
@@ -316,6 +316,9 @@
                 "CUSTOM_DOJONODE_SERVER_API_URL",
                 CUSTOM_DOJONODE_SERVER_API_URL,
               );
+              // fetch metrics from the new API
+              fetchGeneralMetrics();
+              fetchSystemMetrics();
             }}
             />
             <img src={checkmarkIcon} alt="icon" class="w-[30px] ml-2" />
