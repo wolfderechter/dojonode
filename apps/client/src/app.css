@@ -1,8 +1,6 @@
 @import "tailwindcss";
 
 [data-theme="paper"] {
-  --secondaryColor: oklch(86.92% 0.0608 4.27);
-  --tertiaryColor: oklch(59.99% 0 0);
   --backgroundColor: oklch(98.3% 0.0195 87.51);
   --textColor: oklch(38.67% 0 0);
   --nodeTypesColorActive: oklch(60.2% 0.2152 29.48);
@@ -12,12 +10,9 @@
   --cardTitleColor: oklch(60.2% 0.2152 29.48);
   --cardSubBodyColor: oklch(68.35% 0.0104 299.15);
   --inputAccentColor: oklch(92.41% 0.0102 238.52);
-  --themeSwitcherColor: oklch(80.78% 0.0884 29.52);
 }
 
 [data-theme="dark"] {
-  --secondaryColor: oklch(86.92% 0.0608 4.27);
-  --tertiaryColor: oklch(85.14% 0 0);
   --backgroundColor: oklch(22.1% 0.0015 197.05);
   --textColor: oklch(96.72% 0 0);
   --nodeTypesColorActive: oklch(60.2% 0.2152 29.48);
@@ -27,7 +22,6 @@
   --cardTitleColor: oklch(60.2% 0.2152 29.48);
   --cardSubBodyColor: oklch(80.37% 0.0089 128.58);
   --inputAccentColor: oklch(57.65% 0.0196 158.75);
-  --themeSwitcherColor: oklch(60.2% 0.2152 29.48);
 }
 
 /* Responsiveness */
