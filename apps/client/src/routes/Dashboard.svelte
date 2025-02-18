@@ -29,16 +29,16 @@
     SysteminformationMetricsInterface,
   } from "../domain/types";
   import {
-    MYNODE_API_URL,
     DOJONODE_SERVER_API_URL,
   } from "../domain/constants";
 
   // TODO: add error handling back in
-  let hasError = false;
+  let nodeError = $state(false);
+  let hasError = $derived(nodeError);
 
+  // Fetch the NODE_API_URL from backend on start, user can update (and send request to backend) if needed.
+  let NODE_API_URL = $state();
   // if custom localstorage API urls exist, use those, else use the default variables from the constants.ts file
-  let CUSTOM_MYNODE_API_URL =
-    $state(getLocalStorageItem("CUSTOM_MYNODE_API_URL") || MYNODE_API_URL);
   let CUSTOM_DOJONODE_SERVER_API_URL =
     $state(getLocalStorageItem("CUSTOM_DOJONODE_SERVER_API_URL") || DOJONODE_SERVER_API_URL);
 
@@ -64,6 +64,26 @@
   // layout variables
   let connectionsOpen: boolean = $state(false);
 
+  async function fetchConnections() {
+    try {
+      const connectionsResponse = await fetch(
+        CUSTOM_DOJONODE_SERVER_API_URL + "/connections",
+      );
+      if (connectionsResponse.ok) {
+        const connections = await connectionsResponse.json();
+
+        NODE_API_URL = connections.node;
+        nodeError = connections.nodeError;
+
+        if(nodeError){
+          console.error("Node connection has an error, please check if the node is running and reachable on", NODE_API_URL);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching connections:", error);
+    }
+  }
+
   // fetch general metrics from the node RPCs
   async function fetchGeneralMetrics() {
     try {
@@ -73,6 +93,7 @@
       if (generalMetricsResponse.ok) {
         const data = await generalMetricsResponse.json();
 
+        nodeError = data.nodeError;
         chainId = data.chainId;
         gasPrice = BigInt(data.gasPrice);
         peers = data.peers;
@@ -129,6 +150,30 @@
     }
   }
 
+  async function updateNode() {
+    try{
+      const body = JSON.stringify({ node: NODE_API_URL });
+      const response = await fetch(
+        CUSTOM_DOJONODE_SERVER_API_URL + "/connections",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: body,
+        },
+      );
+
+      if(!response.ok){
+        nodeError = true;
+      }
+
+      const data = await response.json();
+      nodeError = data.nodeError
+    } catch(error){
+      nodeError = true;
+    }
+  }
   // switching the nodetype reveals/hides certain cards
   function switchNodeType(type) {
     if (nodeType === type) return; // exit if nodeType is the same as the currently selected type
@@ -149,6 +194,7 @@
 
   onMount(async () => {
     // Fire these fetches immediately
+    fetchConnections();
     fetchGeneralMetrics();
     fetchSystemMetrics();
 
@@ -289,16 +335,13 @@
             <input
               class="shadow appearance-none rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline mt-1"
               type="text"
-              bind:value={CUSTOM_MYNODE_API_URL}
-              placeholder={MYNODE_API_URL}
+              bind:value={NODE_API_URL}
+              placeholder="http://localhost:8545"
               onchange={() => {
-              setLocalStorageItem(
-                "CUSTOM_MYNODE_API_URL",
-                CUSTOM_MYNODE_API_URL,
-              );
-            }}
+                updateNode();
+              }}
             />
-            <img src={checkmarkIcon} alt="icon" class="w-[30px] ml-2" />
+            <img src={nodeError ? warningIcon : checkmarkIcon} alt="icon" class="w-[30px] ml-2" />
           </div>
         </div>
         <div
