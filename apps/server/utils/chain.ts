@@ -5,7 +5,7 @@ export const CHAINS = {
   },
   100: {
     name: "Gnosis",
-    rpc: "https://rpc.gnosischain.com",
+    rpc: "https://rpc.gnosis.gateway.fm",
   },
   167000: {
     name: "Taiko Alethia",
