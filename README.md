@@ -48,7 +48,7 @@ For better security, you can add dojonode to the same Docker network as your nod
 services:
   erigon:
     container_name: erigon
-    image: erigontech/erigon:v3.0.0-beta1
+    image: erigontech/erigon:v3.0.0-beta2
     restart: unless-stopped
     volumes:
       - /home/$USER/gnosis/execution:/home/erigon/.local/share/erigon
