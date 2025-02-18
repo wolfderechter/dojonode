@@ -94,6 +94,10 @@
         const data = await generalMetricsResponse.json();
 
         nodeError = data.nodeError;
+        if (nodeError){
+          return; // if node could not be connected, return early since there won't be any usable metrics
+        }
+
         chainId = data.chainId;
         gasPrice = BigInt(data.gasPrice);
         peers = data.peers;
