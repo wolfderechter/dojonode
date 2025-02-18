@@ -3,20 +3,26 @@ import {
   createWalletClient,
   http,
   PublicClient,
+  WalletClient,
 } from "viem";
 import express from "express";
 import si from "systeminformation";
 import cors from "cors";
 import { getChainInfo } from "./utils/chain";
-import { GeneralMetricsResponse, NetworkSync } from './utils/types';
+import { GeneralMetricsResponse, NetworkSync } from "./utils/types";
 
 const app = express();
 const port = 3009;
 
-const MYNODE_API_URL = "http://100.95.151.102:8545";
-
 // Start new timer on startup, to keep track of runtime
 const startTime = Date.now();
+let startingBlock: number;
+
+let NODE_API_URL = "http://100.95.151.102:8545";
+
+let client: PublicClient; // connected to the node for general metrics
+let walletClient: WalletClient; // connected to the node and fetch syncing status
+let publicNodeClient: PublicClient; // publicNodeClient is connected to a public RPC
 
 let nodeError: Boolean;
 let publicNodeError: Boolean;
@@ -26,6 +32,65 @@ app.use(
     origin: "*",
   })
 );
+
+app.use(express.json());
+
+async function initNodeClients() {
+  try {
+    client = createPublicClient({
+      transport: http(NODE_API_URL),
+    });
+
+    walletClient = createWalletClient({
+      transport: http(NODE_API_URL),
+    });
+
+    // Check if client is reachable
+    await client.request({
+      method: "net_listening",
+    });
+
+    nodeError = false;
+  } catch (error) {
+    nodeError = true;
+  }
+}
+
+async function initPublicNodeClient(url) {
+  try {
+    publicNodeClient = createPublicClient({
+      transport: http(url),
+    });
+
+    // Check if publicNodeClient is reachable (don't use net_listening since the net package isn't usually available in public RPC's)
+    await publicNodeClient.request({
+      method: "eth_blockNumber",
+    });
+
+    publicNodeError = false;
+  } catch (error) {
+    publicNodeError = true;
+  }
+}
+
+app.get("/connections", async (_req, res) => {
+  const connections = {
+    node: NODE_API_URL,
+    nodeError: nodeError,
+  };
+
+  res.json(connections);
+});
+
+app.post("/connections", async (req, res) => {
+  const { node } = req.body;
+
+  NODE_API_URL = node;
+
+  await initNodeClients();
+
+  res.json({ nodeError });
+});
 
 app.get("/systemMetrics", async (_req, res) => {
   const mem = await si.mem();
@@ -54,52 +119,76 @@ app.get("/generalMetrics", async (_req, res) => {
     nodeError: false,
   };
 
-  const chainId = await client.request({
-    method: "eth_chainId",
-  });
-  response.chainId = Number(chainId);
+  try {
+    response.chainId = Number(
+      await client.request({
+        method: "eth_chainId",
+      })
+    );
 
-  const peers = await client.request({
-    method: "net_peerCount",
-  });
-  response.peers = Number(peers);
+    // Note that some nodes will have net_peerCount not open (net)
+    response.peers = Number(
+      await client.request({
+        method: "net_peerCount",
+      })
+    );
 
-  const currentBlock = await client.getBlockNumber();
+    const currentBlock = await client.getBlockNumber();
 
-  const gasPrice = await client.getGasPrice();
-  response.gasPrice = gasPrice?.toString();
+    response.gasPrice = (await client.getGasPrice()).toString();
 
-  const syncingStatus: NetworkSync | false = await walletClient.request({
-    method: "eth_syncing",
-  });
-
-  if (syncingStatus === false) {
-    response.syncingState = "synced";
-    response.nodeHeight = currentBlock.toString();
-    response.chainHeight = currentBlock.toString();
-  } else {
-    // Node is syncing...
-    response.syncingState = "syncing";
-    response.nodeHeight = Number(syncingStatus.highestBlock).toString();
-
-    // While the node is syncing, the chainheight from the node is not reliable, and we have to use public RPC as a fallback
-    const publicClientApi = getChainInfo(response.chainId).rpc;
-    publicClient = createPublicClient({
-      transport: http(publicClientApi),
+    const syncingStatus: NetworkSync | false = await walletClient.request({
+      method: "eth_syncing",
     });
-    response.chainHeight = Number(
-      await publicClient.getBlockNumber()
-    ).toString();
 
-    // Estimate syncing time
-    const blocksDownloaded =
-      Number(syncingStatus.currentBlock) - Number(syncingStatus.startingBlock);
-    const blocksRemaining =
-      Number(syncingStatus.currentBlock) - Number(syncingStatus.highestBlock);
-    const downloadProgress = blocksDownloaded / blocksRemaining;
-    const timeElapsed = Date.now() - startTime;
-    response.estimatedSyncingTimeInSeconds =
-      timeElapsed / downloadProgress / 1000;
+    if (syncingStatus === false) {
+      response.syncingState = "synced";
+      response.nodeHeight = currentBlock.toString();
+      response.chainHeight = currentBlock.toString();
+    } else {
+      /*
+      Node is syncing:
+
+      currentBlock - number of the most-recent block synced
+      highestBlock - number of latest block on the network
+      startingBlock - block number at which syncing started
+
+    */
+      response.syncingState = "syncing";
+      response.nodeHeight = Number(syncingStatus.currentBlock).toString();
+      response.chainHeight = Number(syncingStatus.highestBlock).toString();
+
+      // While the node is syncing, the chainheight and gasPrice from the node is not reliable, so we use a public RPC as a fallback
+      if (publicNodeClient === undefined) {
+        const publicClientApi = getChainInfo(response.chainId).rpc;
+        await initPublicNodeClient(publicClientApi);
+      }
+
+      // Check if we were able to connect to the public node
+      if (!publicNodeError) {
+        response.chainHeight = Number(
+          await publicNodeClient.getBlockNumber()
+        ).toString();
+
+        // Fetch gas from public node since it is not reliable during syncing
+        response.gasPrice = (await publicNodeClient.getGasPrice()).toString();
+      }
+
+      // Estimate syncing time
+      if (startingBlock === undefined)
+        startingBlock = Number(syncingStatus.currentBlock); // set the startBlock ourselves to be more accurate
+
+      const currentBlock = Number(syncingStatus.currentBlock);
+      const blocksDownloaded = currentBlock - startingBlock;
+      const blocksRemaining = Number(response.chainHeight) - currentBlock;
+      const timeElapsed = Date.now() - startTime;
+      const avgBlocksPerSecond = blocksDownloaded / (timeElapsed / 1000);
+
+      response.estimatedSyncingTimeInSeconds =
+        blocksRemaining / avgBlocksPerSecond;
+    }
+  } catch (error) {
+    response.nodeError = true;
   }
 
   res.json(response);
@@ -107,4 +196,5 @@ app.get("/generalMetrics", async (_req, res) => {
 
 app.listen(port, () => {
   console.log(`dojonode API listening at http://localhost:${port}`);
+  initNodeClients();
 });
