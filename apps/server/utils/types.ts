@@ -8,6 +8,7 @@ export interface GeneralMetricsResponse {
   syncingState: SyncState;
   chainId: number | null;
   estimatedSyncingTimeInSeconds: number | null;
+  nodeError: boolean | null;
 }
 
 export interface NetworkSync {

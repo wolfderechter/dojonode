@@ -18,16 +18,8 @@ const MYNODE_API_URL = "http://100.95.151.102:8545";
 // Start new timer on startup, to keep track of runtime
 const startTime = Date.now();
 
-// Client is connected to the node
-const client = createPublicClient({
-  transport: http(MYNODE_API_URL),
-});
-// publicClient is connected to a public RPC
-let publicClient: PublicClient;
-
-const walletClient = createWalletClient({
-  transport: http(MYNODE_API_URL),
-});
+let nodeError: Boolean;
+let publicNodeError: Boolean;
 
 app.use(
   cors({
@@ -59,6 +51,7 @@ app.get("/generalMetrics", async (_req, res) => {
     syncingState: null,
     chainId: null,
     estimatedSyncingTimeInSeconds: null,
+    nodeError: false,
   };
 
   const chainId = await client.request({
