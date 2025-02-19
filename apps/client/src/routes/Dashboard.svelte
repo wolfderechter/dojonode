@@ -17,7 +17,6 @@
   import ChainCard from "../components/Cards/ChainCard.svelte";
   import ThemeSwitcher from "../components/ThemeSwitcher.svelte";
   import SyncProgressbar from "../components/Progressbar/SyncProgressbar.svelte";
-  import purseIcon from "../assets/icons/Purse.avif";
   import checkmarkIcon from "../assets/icons/CheckMark.avif";
   import dojoScrollIcon from "../assets/icons/DojoScroll.svg";
   import warningIcon from "../assets/icons/Warning.avif";
