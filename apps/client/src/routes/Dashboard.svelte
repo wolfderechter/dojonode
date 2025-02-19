@@ -27,9 +27,7 @@
     Systeminfo,
     SysteminformationMetricsInterface,
   } from "../domain/types";
-  import {
-    DOJONODE_SERVER_API_URL,
-  } from "../domain/constants";
+  import { DOJONODE_SERVER_API_URL } from "../domain/constants";
 
   let nodeError = $state(false);
   let dojonodeServerError = $state(false);
@@ -38,8 +36,10 @@
   // Fetch the NODE_API_URL from backend on start, user can update (and send request to backend) if needed.
   let NODE_API_URL = $state();
   // if custom localstorage API urls exist, use those, else use the default variables from the constants.ts file
-  let CUSTOM_DOJONODE_SERVER_API_URL =
-    $state(getLocalStorageItem("CUSTOM_DOJONODE_SERVER_API_URL") || DOJONODE_SERVER_API_URL);
+  let CUSTOM_DOJONODE_SERVER_API_URL = $state(
+    getLocalStorageItem("CUSTOM_DOJONODE_SERVER_API_URL") ||
+      DOJONODE_SERVER_API_URL,
+  );
 
   // General metrics
   let chainId: number = $state();
@@ -57,7 +57,8 @@
   }
 
   let intervalTimer: NodeJS.Timer;
-  let systeminformationMetrics: SysteminformationMetricsInterface = $state(null);
+  let systeminformationMetrics: SysteminformationMetricsInterface =
+    $state(null);
 
   // layout variables
   let connectionsOpen: boolean = $state(false);
@@ -73,15 +74,21 @@
         NODE_API_URL = connections.node;
         nodeError = connections.nodeError;
 
-        if(nodeError){
-          console.error("Node connection has an error, please check if the node is running and reachable on", NODE_API_URL);
+        if (nodeError) {
+          console.error(
+            "Node connection has an error, please check if the node is running and reachable on",
+            NODE_API_URL,
+          );
         }
 
         dojonodeServerError = false;
       }
     } catch (error) {
-      console.error("Error fetching connections, check if dojonode-server is running and reachable", error);
-      dojonodeServerError = true
+      console.error(
+        "Error fetching connections, check if dojonode-server is running and reachable",
+        error,
+      );
+      dojonodeServerError = true;
     }
   }
 
@@ -95,7 +102,7 @@
         const data = await generalMetricsResponse.json();
 
         nodeError = data.nodeError;
-        if (nodeError){
+        if (nodeError) {
           return; // if node could not be connected, return early since there won't be any usable metrics
         }
 
@@ -106,8 +113,11 @@
         chainHeight = Number(data.chainHeight);
         syncingState = data.syncingState;
 
-        if(syncingState === "syncing" && data.estimatedSyncingTimeInSeconds) {
-          estimatedSyncingTime = simpleDuration.stringify(data.estimatedSyncingTimeInSeconds, "m");
+        if (syncingState === "syncing" && data.estimatedSyncingTimeInSeconds) {
+          estimatedSyncingTime = simpleDuration.stringify(
+            data.estimatedSyncingTimeInSeconds,
+            "m",
+          );
         }
 
         syncingProgressPercentage = (nodeHeight / chainHeight) * 100;
@@ -115,8 +125,11 @@
         dojonodeServerError = false;
       }
     } catch (error) {
-      console.error("Error fetching general metrics, check if dojonode-server is running and reachable", error);
-      dojonodeServerError = true
+      console.error(
+        "Error fetching general metrics, check if dojonode-server is running and reachable",
+        error,
+      );
+      dojonodeServerError = true;
     }
   }
 
@@ -158,13 +171,16 @@
 
       dojonodeServerError = false;
     } catch (error) {
-      console.error("Error while fetching systeminfo, check if dojonode-server is running and reachable", error);
-      dojonodeServerError = true
+      console.error(
+        "Error while fetching systeminfo, check if dojonode-server is running and reachable",
+        error,
+      );
+      dojonodeServerError = true;
     }
   }
 
   async function updateNode() {
-    try{
+    try {
       const body = JSON.stringify({ node: NODE_API_URL });
       const response = await fetch(
         CUSTOM_DOJONODE_SERVER_API_URL + "/connections",
@@ -177,13 +193,13 @@
         },
       );
 
-      if(!response.ok){
+      if (!response.ok) {
         nodeError = true;
       }
 
       const data = await response.json();
-      nodeError = data.nodeError
-    } catch(error){
+      nodeError = data.nodeError;
+    } catch (error) {
       nodeError = true;
     }
   }
@@ -320,9 +336,8 @@
 {#if connectionsOpen}
   <DetailsModal title={"Connections"} bind:isOpen={connectionsOpen}>
     {#snippet body()}
-        <div
+      <div
         class="connections grid grid-cols-1 gap-6 mx-5 my-10 max-h-96 overflow-y-auto text-[var(--textColor)]"
-
       >
         <div
           class="flex sm:flex-row flex-col justify-between items-center font-bold"
@@ -338,7 +353,11 @@
                 updateNode();
               }}
             />
-            <img src={nodeError ? warningIcon : checkmarkIcon} alt="icon" class="w-[30px] ml-2" />
+            <img
+              src={nodeError ? warningIcon : checkmarkIcon}
+              alt="icon"
+              class="w-[30px] ml-2"
+            />
           </div>
         </div>
         <div
@@ -352,20 +371,24 @@
               bind:value={CUSTOM_DOJONODE_SERVER_API_URL}
               placeholder={DOJONODE_SERVER_API_URL}
               onchange={() => {
-              setLocalStorageItem(
-                "CUSTOM_DOJONODE_SERVER_API_URL",
-                CUSTOM_DOJONODE_SERVER_API_URL,
-              );
-              // fetch metrics from the new API
-              fetchGeneralMetrics();
-              fetchSystemMetrics();
-            }}
+                setLocalStorageItem(
+                  "CUSTOM_DOJONODE_SERVER_API_URL",
+                  CUSTOM_DOJONODE_SERVER_API_URL,
+                );
+                // fetch metrics from the new API
+                fetchGeneralMetrics();
+                fetchSystemMetrics();
+              }}
             />
-            <img src={dojonodeServerError ? warningIcon : checkmarkIcon} alt="icon" class="w-[30px] ml-2" />
+            <img
+              src={dojonodeServerError ? warningIcon : checkmarkIcon}
+              alt="icon"
+              class="w-[30px] ml-2"
+            />
           </div>
         </div>
       </div>
-      {/snippet}
+    {/snippet}
   </DetailsModal>
 {/if}
 
