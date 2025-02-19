@@ -6,3 +6,6 @@ dist
 
 # vite
 vite.config.ts.timestamp-*
+
+# used by the backend to store NODE_API_URL
+config.json

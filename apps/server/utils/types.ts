@@ -16,3 +16,7 @@ export interface NetworkSync {
   highestBlock: string;
   startingBlock: string;
 }
+
+export interface Config {
+  NODE_API_URL: string;
+}

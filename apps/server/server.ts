@@ -9,16 +9,15 @@ import express from "express";
 import si from "systeminformation";
 import cors from "cors";
 import { getChainInfo } from "./utils/chain";
-import { GeneralMetricsResponse, NetworkSync } from "./utils/types";
-
+import { GeneralMetricsResponse, NetworkSync, Config } from "./utils/types";
+import { readConfig, writeConfig } from "./utils/helpers.ts";
 const app = express();
 const port = 3009;
 
-// Start new timer on startup, to keep track of runtime
-const startTime = Date.now();
+const startTime = Date.now(); // Start new timer on startup, to keep track of runtime
 let startingBlock: number;
 
-let NODE_API_URL = "http://100.95.151.102:8545";
+let config: Config = await readConfig();
 
 let client: PublicClient; // connected to the node for general metrics
 let walletClient: WalletClient; // connected to the node and fetch syncing status
@@ -38,11 +37,11 @@ app.use(express.json());
 async function initNodeClients() {
   try {
     client = createPublicClient({
-      transport: http(NODE_API_URL),
+      transport: http(config.NODE_API_URL),
     });
 
     walletClient = createWalletClient({
-      transport: http(NODE_API_URL),
+      transport: http(config.NODE_API_URL),
     });
 
     // Check if client is reachable
@@ -75,7 +74,7 @@ async function initPublicNodeClient(url) {
 
 app.get("/connections", async (_req, res) => {
   const connections = {
-    node: NODE_API_URL,
+    node: config.NODE_API_URL,
     nodeError: nodeError,
   };
 
@@ -85,8 +84,9 @@ app.get("/connections", async (_req, res) => {
 app.post("/connections", async (req, res) => {
   const { node } = req.body;
 
-  NODE_API_URL = node;
+  config.NODE_API_URL = node;
 
+  await writeConfig(config);
   await initNodeClients();
 
   res.json({ nodeError });
