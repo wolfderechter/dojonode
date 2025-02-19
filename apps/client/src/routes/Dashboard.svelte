@@ -49,7 +49,6 @@
   let syncingState: SyncState = $state();
   let peers: number = $state(null);
   let syncingProgressPercentage = $state(0);
-  let customAddress = $state(getLocalStorageItem("customAddress"));
   let nodeType = $state(NodeTypes.Node);
   let estimatedSyncingTime: string = $state();
 
@@ -325,21 +324,6 @@
         class="connections grid grid-cols-1 gap-6 mx-5 my-10 max-h-96 overflow-y-auto text-[var(--textColor)]"
 
       >
-        <div
-          class="flex sm:flex-row flex-col justify-between items-center font-bold"
-        >
-          address
-          <div class="ml-2 w-72 flex items-center">
-            <input
-              class="shadow appearance-none rounded w-full py-2 px-3 focus:outline-none focus:shadow-outline leading-none"
-              type="text"
-              bind:value={customAddress}
-              onkeyup={() => {
-              setLocalStorageItem("customAddress", customAddress.trim());
-            }}
-            />
-          </div>
-        </div>
         <div
           class="flex sm:flex-row flex-col justify-between items-center font-bold"
         >
