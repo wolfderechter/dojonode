@@ -31,9 +31,9 @@
     DOJONODE_SERVER_API_URL,
   } from "../domain/constants";
 
-  // TODO: add error handling back in
   let nodeError = $state(false);
-  let hasError = $derived(nodeError);
+  let dojonodeServerError = $state(false);
+  let hasError = $derived(nodeError || dojonodeServerError);
 
   // Fetch the NODE_API_URL from backend on start, user can update (and send request to backend) if needed.
   let NODE_API_URL = $state();
@@ -77,9 +77,12 @@
         if(nodeError){
           console.error("Node connection has an error, please check if the node is running and reachable on", NODE_API_URL);
         }
+
+        dojonodeServerError = false;
       }
     } catch (error) {
-      console.error("Error fetching connections:", error);
+      console.error("Error fetching connections, check if dojonode-server is running and reachable", error);
+      dojonodeServerError = true
     }
   }
 
@@ -103,14 +106,19 @@
         nodeHeight = Number(data.nodeHeight);
         chainHeight = Number(data.chainHeight);
         syncingState = data.syncingState;
+
         if(syncingState === "syncing" && data.estimatedSyncingTimeInSeconds) {
           estimatedSyncingTime = simpleDuration.stringify(data.estimatedSyncingTimeInSeconds, "m");
         }
+
+        syncingProgressPercentage = (nodeHeight / chainHeight) * 100;
+
+        dojonodeServerError = false;
       }
     } catch (error) {
-      console.error("Error fetching general metrics:", error);
+      console.error("Error fetching general metrics, check if dojonode-server is running and reachable", error);
+      dojonodeServerError = true
     }
-    syncingProgressPercentage = (nodeHeight / chainHeight) * 100;
   }
 
   // fetch from the nodejs api that exposes system metrics using the npm package systeminformation
@@ -148,8 +156,11 @@
         runtimeMetricType:
           runtimeInHours >= 1 ? MetricTypes.hours : MetricTypes.minutes,
       };
+
+      dojonodeServerError = false;
     } catch (error) {
-      console.error("Error while fetching systeminfo", error);
+      console.error("Error while fetching systeminfo, check if dojonode-server is running and reachable", error);
+      dojonodeServerError = true
     }
   }
 
@@ -271,7 +282,6 @@
       id="cards"
       class="mt-[1px] flex flex-wrap justify-center overflow-y-clip"
     >
-      <!-- TODO: make this dynamic, try to fetch the information from the node? -->
       <ChainCard {chainId} />
       <MemoryCard
         body={systeminformationMetrics?.memUsedGB}
@@ -367,7 +377,7 @@
               fetchSystemMetrics();
             }}
             />
-            <img src={checkmarkIcon} alt="icon" class="w-[30px] ml-2" />
+            <img src={dojonodeServerError ? warningIcon : checkmarkIcon} alt="icon" class="w-[30px] ml-2" />
           </div>
         </div>
       </div>
