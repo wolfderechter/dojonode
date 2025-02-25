@@ -10,7 +10,6 @@
     "start": "bun server.ts"
   },
   "dependencies": {
-    "@types/bun": "^1.2.2",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "cors": "^2.8.5",
