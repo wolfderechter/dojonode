@@ -77,7 +77,7 @@ app.get("/connections", async (_req, res) => {
     node: config.NODE_API_URL,
     nodeError: nodeError,
   };
-
+  console.log("get connections:", connections);
   res.json(connections);
 });
 
@@ -89,6 +89,7 @@ app.post("/connections", async (req, res) => {
   await writeConfig(config);
   await initNodeClients();
 
+  console.log("post connections:", config);
   res.json({ nodeError });
 });
 
