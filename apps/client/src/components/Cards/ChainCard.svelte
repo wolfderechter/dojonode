@@ -1,9 +1,6 @@
 <script lang="ts">
   import Card from "./Card.svelte";
   import { getChainInfo } from "../../utils/chain";
-  import ethIcon from "../../assets/chains/Ethereum.avif";
-  import gnosisIcon from "../../assets/chains/Gnosis.avif";
-  import taikoIcon from "../../assets/chains/Taiko.avif";
 
   interface Props {
     chainId?: number;
@@ -11,14 +8,10 @@
 
   let { chainId }: Props = $props();
 
-  const ICONS = {
-    1: ethIcon,
-    100: gnosisIcon,
-    167000: taikoIcon,
-  };
-
-  const chain = $derived(chainId ? getChainInfo(chainId).name : null);
-  const icon = $derived(chainId ? ICONS[chainId] : null);
+  const chainInfo = $derived(getChainInfo(chainId));
+  const chain = $derived(chainInfo.name);
+  const isTestnet: boolean = $derived(chainInfo.isTestnet);
+  const icon = $derived(chainInfo.icon);
 </script>
 
 <Card title="chain" {icon}>
