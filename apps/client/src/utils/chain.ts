@@ -7,6 +7,16 @@ export const CHAINS = {
     name: "Gnosis",
     rpc: "https://rpc.gnosischain.com",
   },
+  10200: {
+    name: "Chiado",
+    isTestnet: true,
+    rpc: "https://rpc.chiadochain.net",
+  },
+  17000: {
+    name: "Holesky",
+    isTestnet: true,
+    rpc: "https://ethereum-holesky-rpc.publicnode.com",
+  },
   167000: {
     name: "Taiko Alethia",
     rpc: "https://rpc.taiko.xyz",

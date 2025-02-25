@@ -29,4 +29,12 @@
       {/if}
     </div>
   {/snippet}
+
+  {#snippet cardSubBody()}
+    <div>
+      {#if isTestnet}
+        testnet
+      {/if}
+    </div>
+  {/snippet}
 </Card>
