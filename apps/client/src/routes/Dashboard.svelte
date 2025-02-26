@@ -20,18 +20,19 @@
   import checkmarkIcon from "../assets/icons/CheckMark.avif";
   import dojoScrollIcon from "../assets/icons/DojoScroll.svg";
   import warningIcon from "../assets/icons/Warning.avif";
+  import loadingIcon from "../assets/icons/Hourglass.avif";
   import antennaIcon from "../assets/icons/Antenna.avif";
   import { MetricTypes, NodeTypes } from "../domain/enums";
   import type {
+    Status,
     SyncState,
     Systeminfo,
     SysteminformationMetricsInterface,
   } from "../domain/types";
   import { DOJONODE_SERVER_API_URL } from "../domain/constants";
 
-  let nodeError = $state(false);
-  let dojonodeServerError = $state(false);
-  let hasError = $derived(nodeError || dojonodeServerError);
+  let nodeStatus: Status = $state("loading");
+  let dojonodeServerStatus = $state<Status>("loading");
 
   // Fetch the NODE_API_URL from backend on start, user can update (and send request to backend) if needed.
   let NODE_API_URL = $state();
@@ -68,27 +69,32 @@
       const connectionsResponse = await fetch(
         CUSTOM_DOJONODE_SERVER_API_URL + "/connections",
       );
-      if (connectionsResponse.ok) {
-        const connections = await connectionsResponse.json();
 
-        NODE_API_URL = connections.node;
-        nodeError = connections.nodeError;
-
-        if (nodeError) {
-          console.error(
-            "Node connection has an error, please check if the node is running and reachable on",
-            NODE_API_URL,
-          );
-        }
-
-        dojonodeServerError = false;
+      if (!connectionsResponse.ok) {
+        dojonodeServerStatus = "error";
+        return;
       }
+
+      const connections = await connectionsResponse.json();
+
+      NODE_API_URL = connections.node;
+
+      if (connections.nodeError) {
+        nodeStatus = "error";
+        console.error(
+          "Node connection has an error, please check if the node is running and reachable on",
+          NODE_API_URL,
+        );
+        return;
+      }
+      nodeStatus = "success";
+      dojonodeServerStatus = "success";
     } catch (error) {
       console.error(
         "Error fetching connections, check if dojonode-server is running and reachable",
         error,
       );
-      dojonodeServerError = true;
+      dojonodeServerStatus = "error";
     }
   }
 
@@ -98,38 +104,42 @@
       const generalMetricsResponse = await fetch(
         CUSTOM_DOJONODE_SERVER_API_URL + "/generalMetrics",
       );
-      if (generalMetricsResponse.ok) {
-        const data = await generalMetricsResponse.json();
 
-        nodeError = data.nodeError;
-        if (nodeError) {
-          return; // if node could not be connected, return early since there won't be any usable metrics
-        }
-
-        chainId = data.chainId;
-        gasPrice = BigInt(data.gasPrice);
-        peers = data.peers;
-        nodeHeight = Number(data.nodeHeight);
-        chainHeight = Number(data.chainHeight);
-        syncingState = data.syncingState;
-
-        if (syncingState === "syncing" && data.estimatedSyncingTimeInSeconds) {
-          estimatedSyncingTime = simpleDuration.stringify(
-            data.estimatedSyncingTimeInSeconds,
-            "m",
-          );
-        }
-
-        syncingProgressPercentage = (nodeHeight / chainHeight) * 100;
-
-        dojonodeServerError = false;
+      if (!generalMetricsResponse.ok) {
+        dojonodeServerStatus = "error";
       }
+
+      const data = await generalMetricsResponse.json();
+
+      if (data.nodeError) {
+        nodeStatus = "error";
+        return; // if node could not be connected, return early since there won't be any usable metrics
+      }
+
+      nodeStatus = "success";
+      chainId = data.chainId;
+      gasPrice = BigInt(data.gasPrice);
+      peers = data.peers;
+      nodeHeight = Number(data.nodeHeight);
+      chainHeight = Number(data.chainHeight);
+      syncingState = data.syncingState;
+
+      if (syncingState === "syncing" && data.estimatedSyncingTimeInSeconds) {
+        estimatedSyncingTime = simpleDuration.stringify(
+          data.estimatedSyncingTimeInSeconds,
+          "m",
+        );
+      }
+
+      syncingProgressPercentage = (nodeHeight / chainHeight) * 100;
+
+      dojonodeServerStatus = "success";
     } catch (error) {
       console.error(
         "Error fetching general metrics, check if dojonode-server is running and reachable",
         error,
       );
-      dojonodeServerError = true;
+      dojonodeServerStatus = "error";
     }
   }
 
@@ -139,6 +149,11 @@
       const response = await fetch(
         CUSTOM_DOJONODE_SERVER_API_URL + "/systemMetrics",
       );
+
+      if (!response.ok) {
+        dojonodeServerStatus = "error";
+      }
+
       const systemInfo: Systeminfo = await response.json();
 
       const mem = systemInfo.mem;
@@ -169,18 +184,28 @@
           runtimeInHours >= 1 ? MetricTypes.hours : MetricTypes.minutes,
       };
 
-      dojonodeServerError = false;
+      dojonodeServerStatus = "success";
     } catch (error) {
       console.error(
         "Error while fetching systeminfo, check if dojonode-server is running and reachable",
         error,
       );
-      dojonodeServerError = true;
+      dojonodeServerStatus = "error";
     }
   }
 
   async function updateNode() {
     try {
+      // Reset the node stats
+      nodeStatus = "loading";
+      chainId = null;
+      gasPrice = null;
+      peers = null;
+      nodeHeight = null;
+      chainHeight = null;
+      syncingState = null;
+      syncingProgressPercentage = null;
+
       const body = JSON.stringify({ node: NODE_API_URL });
       const response = await fetch(
         CUSTOM_DOJONODE_SERVER_API_URL + "/connections",
@@ -194,15 +219,16 @@
       );
 
       if (!response.ok) {
-        nodeError = true;
+        nodeStatus = "error";
       }
 
       const data = await response.json();
-      nodeError = data.nodeError;
+      nodeStatus = data.nodeStatus ? "success" : "error";
     } catch (error) {
-      nodeError = true;
+      nodeStatus = "error";
     }
   }
+
   // switching the nodetype reveals/hides certain cards
   function switchNodeType(type) {
     if (nodeType === type) return; // exit if nodeType is the same as the currently selected type
@@ -288,7 +314,9 @@
     >
       <img
         src={antennaIcon}
-        class={hasError ? "animateConnections" : ""}
+        class={dojonodeServerStatus === "error" || nodeStatus === "error"
+          ? "animateConnections"
+          : ""}
         alt="antenna icon"
       />
     </button>
@@ -354,7 +382,11 @@
               }}
             />
             <img
-              src={nodeError ? warningIcon : checkmarkIcon}
+              src={nodeStatus === "loading"
+                ? loadingIcon
+                : nodeStatus === "error"
+                  ? warningIcon
+                  : checkmarkIcon}
               alt="icon"
               class="w-[30px] ml-2"
             />
@@ -371,17 +403,26 @@
               bind:value={CUSTOM_DOJONODE_SERVER_API_URL}
               placeholder={DOJONODE_SERVER_API_URL}
               onchange={() => {
+                // reset dojonode stats
+                dojonodeServerStatus = "loading";
+                systeminformationMetrics = null;
+
                 setLocalStorageItem(
                   "CUSTOM_DOJONODE_SERVER_API_URL",
                   CUSTOM_DOJONODE_SERVER_API_URL,
                 );
                 // fetch metrics from the new API
+                fetchConnections();
                 fetchGeneralMetrics();
                 fetchSystemMetrics();
               }}
             />
             <img
-              src={dojonodeServerError ? warningIcon : checkmarkIcon}
+              src={dojonodeServerStatus === "loading"
+                ? loadingIcon
+                : dojonodeServerStatus === "error"
+                  ? warningIcon
+                  : checkmarkIcon}
               alt="icon"
               class="w-[30px] ml-2"
             />

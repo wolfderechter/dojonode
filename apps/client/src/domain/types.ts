@@ -67,3 +67,5 @@ export interface Systeminfo {
 }
 
 export type SyncState = "synced" | "syncing" | "error" | null;
+
+export type Status = "loading" | "success" | "error";
