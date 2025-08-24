@@ -1,9 +1,13 @@
 services:
   client:
     image: wolfderechter/dojonode-client:latest
+    build:
+      context:  ./apps/client
     ports:
       - "7744:80"
   server:
     image: wolfderechter/dojonode-server:latest
+    build:
+      context:  ./apps/server
     ports:
       - "3009:3009"
