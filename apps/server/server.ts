@@ -37,11 +37,11 @@ app.use(express.json());
 async function initNodeClients() {
   try {
     client = createPublicClient({
-      transport: http(config.NODE_API_URL),
+      transport: http(config.NODE_API_URL, {timeout: 5_000}),
     });
 
     walletClient = createWalletClient({
-      transport: http(config.NODE_API_URL),
+      transport: http(config.NODE_API_URL, {timeout: 5_000}),
     });
 
     // Check if client is reachable
