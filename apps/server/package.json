@@ -10,11 +10,11 @@
     "start": "bun server.ts"
   },
   "dependencies": {
-    "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
     "cors": "^2.8.5",
-    "express": "^5.0.1",
-    "systeminformation": "^5.25.11",
-    "viem": "^2.23.2"
+    "express": "^5.1.0",
+    "systeminformation": "^5.27.7",
+    "viem": "^2.34.0"
   }
 }
