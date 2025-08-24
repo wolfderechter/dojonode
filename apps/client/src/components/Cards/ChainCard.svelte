@@ -12,6 +12,7 @@
   const chain = $derived(chainInfo.name);
   const isTestnet: boolean = $derived(chainInfo.isTestnet);
   const icon = $derived(chainInfo.icon);
+  const chainNotFound = $derived(chainInfo.chainNotFound);
 </script>
 
 <Card title="chain" {icon}>
@@ -25,7 +26,9 @@
 
   {#snippet cardSubBody()}
     <div>
-      {#if isTestnet}
+      {#if chainNotFound}
+        chainId {chainId}
+      {:else if isTestnet}
         testnet
       {/if}
     </div>

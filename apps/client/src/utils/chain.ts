@@ -1,6 +1,7 @@
 import ethIcon from "../assets/chains/Ethereum.avif";
 import gnosisIcon from "../assets/chains/Gnosis.avif";
 import taikoIcon from "../assets/chains/Taiko.avif";
+import defaultIcon from "../assets/icons/Questionmark.avif";
 
 export const CHAINS = {
   1: {
@@ -34,5 +35,5 @@ export const CHAINS = {
 
 export function getChainInfo(chainId: number) {
   // TODO: set some default icon if chain is not found
-  return CHAINS[chainId] || { name: null, rpc: null, icon: null };
+  return CHAINS[chainId] || { name: "Unknown", rpc: null, icon: defaultIcon, chainNotFound: true };
 }
